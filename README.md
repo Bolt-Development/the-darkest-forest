@@ -4,8 +4,8 @@ This will be our first project, in which we will be getting to know each other w
 
 BDT Roles:
 
-Project Manager: Nick Rogers
-Lead Programmer: Joshua Byrom
-Programmer: Joshua Rowe
-Artist: Jordi Navarrete
-Sound: Chris Kukla
+* Project Manager: Nick Rogers
+* Lead Programmer: Joshua Byrom
+* Programmer: Joshua Rowe
+* Artist: Jordi Navarrete
+* Sound: Chris Kukla
