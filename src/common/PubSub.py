@@ -4,16 +4,15 @@ from Guard import *
 class PubSub(object):
     def __init__(self):
         self.handlers = {}
+        self.conditions = {}
+        self.memory = {}
 
     def emit(self, message_type, **kwargs):
         if message_type in self.handlers:
             handlers = self.handlers[message_type]
             to_remove = []
-            
-            reason = guarded(lambda: kwargs['reason']) or 'none'
-            message = guarded(lambda: kwargs['message']) or 'none'
 
-            event = Message(message_type, message, reason)
+            event = self._parse_msg_from_kwargs(message_type, **kwargs)
 
             for handler in handlers:
                 handler.handle(event, **kwargs)
@@ -23,16 +22,55 @@ class PubSub(object):
             for finished in to_remove:
                 handlers.remove(finished)
 
-    def on(self, message_type, callback, repeats='infinite'):
+        # only remembers last arguments
+        self.memory[message_type]=kwargs
+
+    def on(
+            self,
+            message_type,
+            callback,
+            repeats='infinite',
+            condition=False,
+            memory=False,
+            unique=True
+        ):
+
         handler = LimitedHandler(message_type, callback, repeats)
         
         if not message_type in self.handlers:
             self.handlers[message_type] = []
 
-        self.handlers[message_type].append(handler)
+        if self._add_handler(message_type, handler, memory, unique):
+            if condition:
+                self.conditions[handler] = condition
 
     def once(self, message_type, callback):
         self.on(message_type, callback, 0)
+
+    def _parse_kwargs(self, **kwargs):
+        return (guarded(lambda: kwargs['reason']) or 'none',
+                guarded(lambda: kwargs['message']) or 'none')
+
+    def _parse_msg_from_kwargs(self, msg, **kwargs):
+        reason, message = self._parse_kwargs(**kwargs)
+        return Message(msg, message, reason)
+                               
+    def _call_immediately(self, handler, message_type, memory=False):
+        if memory and message_type in self.memory:
+            kwargs = self.memory[message_type]
+            event = self._parse_msg_from_kwargs(message_type, **kwargs)
+            handler.handle(event, **kwargs)
+
+    def _add_handler(self, message_type, handler, memory=False, unique=True):
+        handlers = self.handlers[message_type]
+
+        if unique and handler not in handlers:
+            self._call_immediately(handler, message_type, memory)
+            handlers.append(handler)
+            return True
+        else:
+            return False
+    
 
 class Handler(PubSub):
     def __init__(self, message_type, callback):
@@ -50,6 +88,16 @@ class Handler(PubSub):
 
             self.emit('callback')
 
+    def __eq__(self, other):
+        return (isinstance(other, Handler) and
+                self.message_type == other.message_type and
+                self.callback == other.callback)
+
+    def __repr__(self):
+        return " ".join([self.message_type or 'no_type',
+                         str(self.callback),
+                         str(self.call_count)])
+
 class LimitedHandler(Handler):
     def __init__(self, message_type, callback, repeats='infinite'):
         Handler.__init__(self, message_type, callback)
@@ -63,6 +111,11 @@ class LimitedHandler(Handler):
             self.emit('finished', emitter=self)
             self.finished = True
 
+    def __repr__(self):
+        return " ".join([Handler.__repr__(self),
+                         str(self.repeats)])
+                         
+
 
 if __name__ == '__main__':
     pb = PubSub()
@@ -70,6 +123,11 @@ if __name__ == '__main__':
     def on_hello_world(event, **kwargs):
         print 'hello, world: from', guarded(lambda:kwargs['emitter']) or 'no one'
 
+    def on_init(event, **kwargs):
+        print 'This was called from memory, while', kwargs['message']
+
+    pb.emit('init', message='this was called before any emits.')
+    pb.on('hello_world', on_hello_world, repeats=12)
     pb.on('hello_world', on_hello_world, repeats=12)
 
 
@@ -79,3 +137,5 @@ if __name__ == '__main__':
                 reason = 'debugging',
                 emitter = pb)
         print pb.handlers
+
+    pb.on('init', on_init, memory=True)
