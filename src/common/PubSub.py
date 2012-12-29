@@ -1,5 +1,6 @@
 class PubSub(object):
-    pass
+    def __init__(self):
+        self.handlers = {}
 
 
 if __name__ == '__main__':
