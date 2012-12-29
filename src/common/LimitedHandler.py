@@ -12,6 +12,7 @@ class LimitedHandler(Handler):
             Handler.handle(self, event, **kwargs)
         else:
             self.emit('finished', emitter=self)
+            self.finished = True
             
 if __name__ == '__main__':
     def say_hello(event, **kwargs):

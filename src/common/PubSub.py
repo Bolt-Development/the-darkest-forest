@@ -17,10 +17,12 @@ class PubSub(object):
 
             for handler in handlers:
                 handler.handle(event, **kwargs)
-                guarded(lambda:handler.finished, lambda x:to_remove.append(x))
+                if guarded(lambda:handler.finished):
+                    handlers.remove(handler)
 
             for finished in to_remove:
-                self.handlers.remove(finished)
+                print finished
+                handlers.remove(finished)
 
     def on(self, message_type, callback, repeats='infinite'):
         handler = LimitedHandler(message_type, callback, repeats)
@@ -40,10 +42,12 @@ if __name__ == '__main__':
     def on_hello_world(event, **kwargs):
         print 'hello, world: from', guarded(lambda:kwargs['emitter']) or 'no one'
 
-    pb.on('hello_world', on_hello_world)
+    pb.on('hello_world', on_hello_world, repeats=12)
 
 
-    pb.emit('hello_world',
-            message = 'hello, world',
-            reason = 'debugging',
-            emitter = pb)
+    for x in xrange(20):
+        pb.emit('hello_world',
+                message = 'hello, world',
+                reason = 'debugging',
+                emitter = pb)
+        print pb.handlers
