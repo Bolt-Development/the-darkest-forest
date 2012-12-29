@@ -10,4 +10,5 @@ if __name__ == '__main__':
     from models.Engine import *
     
     engine = Engine()
-    print engine.handlers
+    engine.set_caption('Engine Debug Testing')
+    engine.start()
