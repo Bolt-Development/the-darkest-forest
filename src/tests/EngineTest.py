@@ -7,8 +7,7 @@ if __name__ == '__main__':
     if up_one_folder.endswith('src') and not up_one_folder in sys.path:
         sys.path.insert(0, up_one_folder)
 
-    print sys.path
-
     from models.Engine import *
     
     engine = Engine()
+    print engine.handlers
