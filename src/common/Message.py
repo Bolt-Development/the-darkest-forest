@@ -1,6 +1,6 @@
 import time
 
-class Event(object):
+class Message(object):
     def __init__(self, message_type, message='', reason=None):
         self.message_type = message_type
         self.message = message

@@ -1,5 +1,5 @@
 from PubSub import *
-from Event import *
+from Message import *
 
 class Handler(PubSub):
     def __init__(self, message_type, callback):
@@ -15,7 +15,7 @@ class Handler(PubSub):
             self.callback(self.event, **kwargs)
             self.call_count = self.call_count + 1
 
-            self.emit(Event('callback'))
+            self.emit(Message('callback'))
 
 if __name__ == '__main__':
     pass
