@@ -16,8 +16,9 @@ class PubSub(object):
 
             for handler in handlers:
                 handler.handle(event, **kwargs)
-                if guarded(lambda:handler.finished):
-                    handlers.remove(handler)
+                condition = self._handle_condition(handler, event, **kwargs)
+                if not condition or guarded(lambda:handler.finished):
+                    to_remove.append(handler)
 
             for finished in to_remove:
                 handlers.remove(finished)
@@ -70,6 +71,13 @@ class PubSub(object):
             return True
         else:
             return False
+
+    def _handle_condition(self, handler, event, **args):
+        condition = guarded(lambda:self.conditions[handler]) or False
+        if condition:
+            return condition(handler, event, **args)
+        else:
+            return True
     
 
 class Handler(PubSub):
@@ -127,7 +135,11 @@ if __name__ == '__main__':
         print 'This was called from memory, while', kwargs['message']
 
     pb.emit('init', message='this was called before any emits.')
-    pb.on('hello_world', on_hello_world, repeats=12)
+
+    def stop_at_three(handler, event, **kwargs):
+        return handler.call_count < 3
+    
+    pb.on('hello_world', on_hello_world, repeats=12, condition=stop_at_three)
     pb.on('hello_world', on_hello_world, repeats=12)
 
 
