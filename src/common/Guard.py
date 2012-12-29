@@ -1,5 +1,8 @@
-def guarded(statement):
+def guarded(statement, callback=None):
     try:
-        return statement()
+        valid = statement()
+        if not callback is None:
+            callback(valid)
+        return valid
     except:
         return False

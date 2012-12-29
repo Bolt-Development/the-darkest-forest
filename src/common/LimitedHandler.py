@@ -11,7 +11,7 @@ class LimitedHandler(Handler):
         if self.repeats is 'infinite' or self.call_count <= self.repeats:
             Handler.handle(self, event, **kwargs)
         else:
-            self.emit('finished')
+            self.emit('finished', emitter=self)
             
 if __name__ == '__main__':
     def say_hello(event, **kwargs):
