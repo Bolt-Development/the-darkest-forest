@@ -7,6 +7,6 @@ BDT Roles:
 * Project Manager: Nick Rogers
 * Lead Programmer: Joshua Byrom
 * Programmer: Joshua Rowe
-* Programmer: Geriant Spackman
+* Programmer: Geraint Spackman
 * Artist: Jordi Navarrete
 * Sound: Chris Kukla
