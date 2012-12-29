@@ -12,10 +12,14 @@ class Handler(PubSub):
 
     def handle(self, event, **kwargs):
         if self.message_type == event.message_type:
-            self.callback(self.event, **kwargs)
+            self.callback(event, **kwargs)
             self.call_count = self.call_count + 1
 
-            self.emit(Message('callback'))
+            self.emit('callback')
 
 if __name__ == '__main__':
-    pass
+    def say_hello(event, **kwargs):
+        print 'hello, world', kwargs
+        
+    handler = Handler('say_hello', say_hello)
+    handler.handle(Message('say_hello'), reason='unspecified', target='audience')
