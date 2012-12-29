@@ -1,4 +1,4 @@
-from LimitedHandler import *
+from Message import *
 from Guard import *
 
 class PubSub(object):
@@ -21,7 +21,6 @@ class PubSub(object):
                     handlers.remove(handler)
 
             for finished in to_remove:
-                print finished
                 handlers.remove(finished)
 
     def on(self, message_type, callback, repeats='infinite'):
@@ -34,6 +33,35 @@ class PubSub(object):
 
     def once(self, message_type, callback):
         self.on(message_type, callback, 0)
+
+class Handler(PubSub):
+    def __init__(self, message_type, callback):
+        PubSub.__init__(self)
+
+        self.message_type = message_type
+        
+        self.callback = callback
+        self.call_count = 0
+
+    def handle(self, event, **kwargs):
+        if self.message_type == event.message_type:
+            self.callback(event, **kwargs)
+            self.call_count = self.call_count + 1
+
+            self.emit('callback')
+
+class LimitedHandler(Handler):
+    def __init__(self, message_type, callback, repeats='infinite'):
+        Handler.__init__(self, message_type, callback)
+
+        self.repeats = repeats
+
+    def handle(self, event, **kwargs):
+        if self.repeats is 'infinite' or self.call_count <= self.repeats:
+            Handler.handle(self, event, **kwargs)
+        else:
+            self.emit('finished', emitter=self)
+            self.finished = True
 
 
 if __name__ == '__main__':
