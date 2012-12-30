@@ -1,6 +1,6 @@
-## Bolt Development Team's Debut.
+## Bolt Development's Debut Title
 
-This will be our first project, in which we will be getting to know each other well and enhancing our skills in our specific areas and communication. We seek to create a fun and immersive experience that players will enjoy, and to put forth an effort that other developers can appreciate.
+This will be our first project, in which we will be getting to know each other and enhancing our skills and communication. We seek to create a fun and immersive experience that players will enjoy, and to put forth an effort that other developers can appreciate.
 
 The team is being lead by talented and professional individuals with many years of experience creating quality software solutions.
 
