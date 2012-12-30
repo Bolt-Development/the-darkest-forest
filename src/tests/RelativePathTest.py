@@ -8,5 +8,8 @@ if __name__ == '__main__':
         sys.path.insert(0, up_one_folder)
 
     from common.math.Collision import *
+
+    print sys.path
+
     
     collision = Collision()
