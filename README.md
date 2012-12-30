@@ -8,5 +8,6 @@ BDT Roles:
 * Lead Programmer: Joshua Byrom
 * Programmer: Joshua Rowe
 * Programmer: Geraint Spackman
-* Artist: Jordi Navarrete
-* Sound: Chris Kukla
+* Artist: Jordi Navarrete, Kindrick McAlister
+* Sound: Chris Kukla, Kindrick McAlister
+* Social Media: Jason McArdle
