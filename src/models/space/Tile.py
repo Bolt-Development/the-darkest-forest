@@ -1,4 +1,6 @@
 # TODO :: import pubsub
+from TileContents import *
+
 
 class Tile(PubSub):
     def __init__(self, column, row, width, height):
@@ -10,6 +12,7 @@ class Tile(PubSub):
         self.height = height
 
         # TODO :: add global position variable
+        self.contents = TileContents()
 
 
 if __name__ == '__main__':
