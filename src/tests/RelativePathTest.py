@@ -1,10 +1,10 @@
+from TestingUtils import *
+
 if __name__ == '__main__':
+    add_source_folder()
 
-    import sys
-    import os
 
-    sys.path.insert(0, os.path.normpath(os.path.join(os.getcwd(), "..")))
-
+    # create a deep module
     from common.math.Collision import *
 
     

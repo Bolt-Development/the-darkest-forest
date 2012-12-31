@@ -1,8 +1,7 @@
-if __name__ == '__main__':
-    import sys
-    import os
+from TestingUtils import *
 
-    sys.path.insert(0, os.path.normpath(os.path.join(os.getcwd(), "..")))
+if __name__ == '__main__':
+    add_source_folder()
 
     from models.Engine import *
 
