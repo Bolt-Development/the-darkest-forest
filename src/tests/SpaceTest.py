@@ -1,28 +1,34 @@
 from TestingUtils import *
 
 class GridView(object):
-    def __init__(self, grid):
+    def __init__(self, grid, width, height):
         self.grid = grid
+        
+        self.x = 0
+        self.y = 0
+        self.width = width
+        self.height = height
+        
+        
+        self.scale_x = width / float(self.grid.width)
+        self.scale_y = height / float(self.grid.height)
         
     def on_render(self, event, **kwargs):
         surface = kwargs['surface']
         self.render_on_surface(surface)
+        self.emit('render', emitter = self, surface = surface)
+        
         
     def render_on_surface(self, surface):
         for column in xrange(self.grid.columns):
-            for row in xrange(self.grid.rows):
-                space = self.grid.get(column, row)
-                self.render_space(space, surface)   # ideally handled by a tile view class
-                
-    def render_space(self, space, surface):
-        x, y = space.column * space.width, space.row * space.height
-        left = x + space.width
-        bottom = y + space.height
-        
-        pygame.draw.line(surface, (255, 255, 255), (x, y), (left, y))
-        pygame.draw.line(surface, (255, 255, 255), (left, y), (left, bottom))
-        pygame.draw.line(surface, (255, 255, 255), (x, bottom), (left, bottom))
-        pygame.draw.line(surface, (255, 255, 255), (x, y), (x, bottom))
+            x = self.x + (self.scale_x * column * self.grid.space_width)
+            pygame.draw.line(surface, (255, 255, 255), (x, self.y), (x, self.grid.height * self.scale_y))
+        pygame.draw.line(surface, (255, 255, 255), (self.x + self.width, self.y), (self.x + self.width, self.grid.height * self.scale_y))
+            
+        for row in xrange(self.grid.rows):
+            y = self.y + (self.scale_y * row * self.grid.space_height)
+            pygame.draw.line(surface, (255, 255, 255), (self.x, y), (self.x + self.grid.width * self.scale_x, y))
+        pygame.draw.line(surface, (255, 255, 255), (self.x, self.y + self.height), (self.x + self.grid.width * self.scale_x, self.y + self.height))
 
 if __name__ == '__main__':
     add_source_folder()
@@ -37,11 +43,17 @@ if __name__ == '__main__':
         engine = kwargs['emitter']
         def tile_generator(grid, column, row):
             return Tile(column, row, grid.space_width, grid.space_height)
-        grid = Grid(engine.width, engine.height, 100, 100)
+        grid = Grid(engine.width, engine.height, 10, 6)
         grid.init(tile_generator)
         
-        view = GridView(grid)
+        view = GridView(grid, engine.width - 200, engine.height - 1)
+        
+        # benefits of MVC
+        mini_view = GridView(grid, 100, 100)
+        mini_view.x = engine.width - mini_view.width - 1
+        
         engine.on('render', view.on_render)
+        engine.on('render', mini_view.on_render)
 
     
     engine = Engine()

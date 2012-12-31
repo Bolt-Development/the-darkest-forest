@@ -1,5 +1,4 @@
 from ..common.PubSub import *
-
 class Grid(PubSub):
     def __init__(self, width, height, columns, rows):
         PubSub.__init__(self)
@@ -7,11 +6,13 @@ class Grid(PubSub):
         self.width = width
         self.height = height
 
+        print width, height
+
         self.columns = columns
         self.rows = rows
 
-        self.space_width = self.width / self.columns
-        self.space_height = self.height / self.rows
+        self.space_width = self.width / float(self.columns)
+        self.space_height = self.height / float(self.rows)
 
         self.elems = []
         self.is_init = False
