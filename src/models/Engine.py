@@ -96,13 +96,13 @@ class Engine(PubSub):
         pygame.quit()
 
     def _handle_pygame_events(self):
-        any_key_down = False
+        any_input = False
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.stop()
             elif event.type == pygame.KEYDOWN:
-                any_key_down = True
+                any_input = True
                 if event.key == pygame.K_ESCAPE:
                     self.stop()
                 else:
@@ -111,9 +111,24 @@ class Engine(PubSub):
 
                     # or you can listen for specific keys
                     self.emit(''.join([name, '_down']))
+            elif event.type == pygame.KEYUP:
+                any_input = True
+                name = pygame.key.name(event.key)
+                self.emit('key_up', name = name, key = event.key)
+                self.emit(''.join([name, '_up']))
+            elif event.type == pygame.MOUSEMOTION:
+                any_input = True
+                self.emit('mouse_motion', position=event.pos, relative=event.rel, button_states=event.buttons)
+            elif event.type == pygame.MOUSEBUTTONUP:
+                any_input = True
+                self.emit('mouse_up', position=event.pos, button=event.button)
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                any_input = True
+                self.emit('mouse_down', position=event.pos, button=event.button)
+                
 
-        if not any_key_down:
-            self.emit('no_keys_down')
+        if not any_input:
+            self.emit('no_input')
 
 if __name__ == '__main__':
     pass
