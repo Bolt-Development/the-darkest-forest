@@ -18,14 +18,17 @@ class GridView(object):
         
     def on_mouse_moved(self, event, **kwargs):
         x, y  = kwargs['position']
+        column, row = self.position_to_column_row(x, y)
+        if column and row:
+            self.grid.tag('mouse_over', column, row)
         
+    def position_to_column_row(self, x, y):
         if x > self.x and x < self.x + self.width:
             if y > self.y and y < self.y + self.height:
                 dx = ((x - self.x) / float(self.width)) * self.grid.columns
-                dy = (y / float(self.height)) * self.grid.rows
-                
-                self.grid.tag('mouse_over', dx, dy)
-        
+                dy = ((y - self.y) / float(self.height)) * self.grid.rows
+                return dx, dy
+        return False, False
         
     def render_on_surface(self, surface):
         for column in xrange(self.grid.columns):
