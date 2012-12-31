@@ -1,6 +1,6 @@
 import pygame
 
-from .common.PubSub import *
+from common.PubSub import *
 
 class Engine(PubSub):
     def __init__(self):
