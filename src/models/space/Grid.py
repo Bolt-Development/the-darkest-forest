@@ -14,17 +14,21 @@ class Grid(PubSub):
         self.space_height = self.height / self.rows
 
         self.elems = []
-        self.init = False
+        self.is_init = False
 
     def init(self, generator):
         for column in xrange(self.columns):
             for row in xrange(self.rows):
                 self.elems.append(generator(self, column, row))
+        self.is_init = True
         self.emit('init', emitter = self)
+        
+    def to_index(self, column, row):
+        return column * self.rows + row
 
 
     def get(self, column, row):
-        if not self.init:
+        if not self.is_init:
             return None
         
         guarded_column = column % self.columns

@@ -10,7 +10,6 @@ class Tile(PubSub):
         self.width = width
         self.height = height
 
-        # TODO :: add global position variable
         self.contents = []
 
     def add_contents(self, conts, unique = True):

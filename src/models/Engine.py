@@ -17,7 +17,7 @@ class Engine(PubSub):
             self.init_flow_controls()
 
             self.initialized = True
-            self.emit('init', target = self)
+            self.emit('init', emitter = self)
 
     def init_flow_controls(self, value=False):
         self.active = value
