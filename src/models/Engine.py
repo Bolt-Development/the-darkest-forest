@@ -2,8 +2,11 @@ import pygame
 from .common.PubSub import *
 
 class Engine(PubSub):
-    def __init__(self):
+    def __init__(self, width=854, height=480):
         PubSub.__init__(self)
+
+        self.width = width
+        self.height = height
 
     def init(self):
         if not hasattr(self, 'initialized'):
@@ -14,17 +17,16 @@ class Engine(PubSub):
             self.init_flow_controls()
 
             self.initialized = True
-            self.emit('init')
+            self.emit('init', target = self)
 
     def init_flow_controls(self, value=False):
         self.active = value
         self.paused = value
 
-    def _init_pygame(self, size=[854,480]):
+    def _init_pygame(self):
         pygame.init()
 
-        self.width, self.height = size
-        self.screen = pygame.display.set_mode(size)
+        self.screen = pygame.display.set_mode([self.width, self.height])
 
     def init_font(self, fontsize=35):
         if not hasattr(self, 'fontsize'):
