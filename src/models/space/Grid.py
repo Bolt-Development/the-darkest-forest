@@ -6,8 +6,6 @@ class Grid(PubSub):
         self.width = width
         self.height = height
 
-        print width, height
-
         self.columns = columns
         self.rows = rows
 
@@ -15,6 +13,7 @@ class Grid(PubSub):
         self.space_height = self.height / float(self.rows)
 
         self.elems = []
+        self.tagged = []
         self.is_init = False
 
     def init(self, generator):
@@ -26,7 +25,29 @@ class Grid(PubSub):
         
     def to_index(self, column, row):
         return column * self.rows + row
+    
+    def position_to_index(self, x, y):
+        return x / self.space_width, y / self.space_height
 
+    def tag(self, column, row):
+        try:
+            element = self.get(column, row)
+            self.tagged.append(element)
+            self.emit('tagged', target=element)
+        except:
+            pass
+        
+    def untag(self, column, row):
+        try:
+            element = self.get(column, row)
+            self.tagged.remove(element)
+            self.emit('untagged', target=element)
+        except:
+            pass
+        
+    def clear_tags(self):
+        self.emit('cleared_taggs', tags=self.tagged)
+        self.tagged = []
 
     def get(self, column, row):
         if not self.is_init:
@@ -43,5 +64,8 @@ class Grid(PubSub):
         index = self.to_index(guarded_column, guarded_row);
         return self.elems[index];
 
+    def map_over_elems(self, fun):
+        return [fun(element) for element in self.elems]
+    
 if __name__ == '__main__':
     pass

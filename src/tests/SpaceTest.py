@@ -9,7 +9,6 @@ class GridView(object):
         self.width = width
         self.height = height
         
-        
         self.scale_x = width / float(self.grid.width)
         self.scale_y = height / float(self.grid.height)
         
@@ -29,6 +28,13 @@ class GridView(object):
             y = self.y + (self.scale_y * row * self.grid.space_height)
             pygame.draw.line(surface, (255, 255, 255), (self.x, y), (self.x + self.grid.width * self.scale_x, y))
         pygame.draw.line(surface, (255, 255, 255), (self.x, self.y + self.height), (self.x + self.grid.width * self.scale_x, self.y + self.height))
+
+        for element in self.grid.tagged:
+            x = self.x + (self.scale_x * element.column * element.width) + 1
+            y = self.y + (self.scale_y * element.row * element.height) + 1
+            w = self.scale_x * element.width - 1
+            h = self.scale_y * element.height - 1
+            pygame.draw.rect(surface, (0, 0, 255), [x, y, w, h])
 
 if __name__ == '__main__':
     add_source_folder()

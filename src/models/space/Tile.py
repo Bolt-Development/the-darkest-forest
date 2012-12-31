@@ -12,6 +12,7 @@ class Tile(PubSub):
 
         self.contents = []
 
+
     def add_contents(self, conts, unique = True):
         if unique:
             if conts not in self.contents:
