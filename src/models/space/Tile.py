@@ -1,5 +1,4 @@
-# TODO :: import pubsub
-from TileContents import *
+from ..common.PubSub import *
 
 
 class Tile(PubSub):
@@ -12,7 +11,22 @@ class Tile(PubSub):
         self.height = height
 
         # TODO :: add global position variable
-        self.contents = TileContents()
+        self.contents = []
+
+    def add_contents(self, conts, unique = True):
+        if unique:
+            if conts not in self.contents:
+                self.contents.append(conts)
+        else:
+            self.contents.append(conts)
+
+    def remove_contents(self, conts):
+        try:
+            self.remove(conts)
+        except:
+            pass
+
+    
 
 
 if __name__ == '__main__':

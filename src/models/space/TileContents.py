@@ -1,6 +1,4 @@
-from Tile import *
-# TODO :: import PubSub
-
+from ..common.PubSub import *
 
 class TileContents(PubSub):
     def __init__(self, tile):
