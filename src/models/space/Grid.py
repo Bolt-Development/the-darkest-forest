@@ -13,7 +13,7 @@ class Grid(PubSub):
         self.space_height = self.height / float(self.rows)
 
         self.elems = []
-        self.tagged = []
+        self.tagged = {}
         self.is_init = False
 
     def init(self, generator):
@@ -28,33 +28,40 @@ class Grid(PubSub):
     
     def position_to_index(self, x, y):
         return x / self.space_width, y / self.space_height
+    
+    def get_tag(self, tagname):
+        try:
+            return self.tagged[tagname]
+        except:
+            return None
 
-    def tag(self, column, row):
+    def tag(self, tagname, column, row):
         try:
             element = self.get(column, row)
-            self.tagged.append(element)
+            self.untag(tagname)
+            self.tagged[tagname] = element
             self.emit('tagged', target=element)
         except:
             pass
         
-    def untag(self, column, row):
+    def untag(self, tagname):
         try:
-            element = self.get(column, row)
-            self.tagged.remove(element)
+            element = self.tagged[tagname]
+            del self.tagged[tagname]
             self.emit('untagged', target=element)
         except:
             pass
         
     def clear_tags(self):
         self.emit('cleared_taggs', tags=self.tagged)
-        self.tagged = []
+        self.tagged.clear()
 
     def get(self, column, row):
         if not self.is_init:
             return None
         
-        guarded_column = column % self.columns
-        guarded_row = row % self.rows
+        guarded_column = int(column) % self.columns
+        guarded_row = int(row) % self.rows
 
         if guarded_column < 0:
             guarded_column += self.columns

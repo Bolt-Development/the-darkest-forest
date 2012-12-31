@@ -15,7 +15,16 @@ class GridView(object):
     def on_render(self, event, **kwargs):
         surface = kwargs['surface']
         self.render_on_surface(surface)
-        self.emit('render', emitter = self, surface = surface)
+        
+    def on_mouse_moved(self, event, **kwargs):
+        x, y  = kwargs['position']
+        
+        if x > self.x and x < self.x + self.width:
+            if y > self.y and y < self.y + self.height:
+                dx = ((x - self.x) / float(self.width)) * self.grid.columns
+                dy = (y / float(self.height)) * self.grid.rows
+                
+                self.grid.tag('mouse_over', dx, dy)
         
         
     def render_on_surface(self, surface):
@@ -29,11 +38,12 @@ class GridView(object):
             pygame.draw.line(surface, (255, 255, 255), (self.x, y), (self.x + self.grid.width * self.scale_x, y))
         pygame.draw.line(surface, (255, 255, 255), (self.x, self.y + self.height), (self.x + self.grid.width * self.scale_x, self.y + self.height))
 
-        for element in self.grid.tagged:
-            x = self.x + (self.scale_x * element.column * element.width) + 1
-            y = self.y + (self.scale_y * element.row * element.height) + 1
-            w = self.scale_x * element.width - 1
-            h = self.scale_y * element.height - 1
+        mouse_over = self.grid.get_tag('mouse_over')
+        if mouse_over:
+            x = self.x + (self.scale_x * mouse_over.column * mouse_over.width) + 1
+            y = self.y + (self.scale_y * mouse_over.row * mouse_over.height) + 1
+            w = self.scale_x * mouse_over.width - 1
+            h = self.scale_y * mouse_over.height - 1
             pygame.draw.rect(surface, (0, 0, 255), [x, y, w, h])
 
 if __name__ == '__main__':
@@ -60,6 +70,9 @@ if __name__ == '__main__':
         
         engine.on('render', view.on_render)
         engine.on('render', mini_view.on_render)
+        
+        engine.on('mouse_motion', view.on_mouse_moved)
+        engine.on('mouse_motion', mini_view.on_mouse_moved)
 
     
     engine = Engine()
