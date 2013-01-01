@@ -2,6 +2,8 @@ import os
 import sys
 import fnmatch
 
+import pygame
+
 interesting_types = ['jpg', 'jpeg', 'gif', 'bmp', 'png', 'ogg', 'wav']
 def get_interesting_files(path):
     result = []
@@ -47,3 +49,11 @@ class Resource(object):
         
         self.name, self.extension = os.path.basename(path).split('.')
         self.type = get_type_by_ext(path)
+
+    def load(self):
+        if self.type == 'image':
+            return pygame.image.load(self.path)
+        elif self.type == 'sound':
+            return pygame.mixer.Sound(self.path)
+        else:
+            return self.path
