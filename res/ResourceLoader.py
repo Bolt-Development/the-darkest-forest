@@ -3,4 +3,4 @@ class ResourceLoader(object):
 		pass
 		
 	def load_resource(self, name):
-	
+		pass
