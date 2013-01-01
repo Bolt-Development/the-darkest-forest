@@ -25,9 +25,8 @@ class GridView(object):
     def on_mouse_down(self, event, **kwargs):
         x, y  = kwargs['position']
         column, row = self.position_to_column_row(x, y)
-        print kwargs
         if column and row:
-            self.grid.tag('mouse_over', column, row)
+            self.grid.tag('mouse_down_' + str(kwargs['button']), column, row)
             
         
     def position_on_self(self, tile): 
@@ -59,6 +58,10 @@ class GridView(object):
         mouse_over = self.grid.get_tag('mouse_over')
         if mouse_over:
             pygame.draw.rect(surface, (0, 0, 255), self.position_on_self(mouse_over))
+            
+        mouse_down = self.grid.get_tag('mouse_down_1')
+        if mouse_down:
+            pygame.draw.rect(surface, (0, 255, 255), self.position_on_self(mouse_down))
 
 if __name__ == '__main__':
     add_source_folder()
