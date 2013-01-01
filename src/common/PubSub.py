@@ -93,7 +93,7 @@ class Handler(PubSub):
         if self.message_type == event.message_type:
             try:
                 self.callback(event, **kwargs)
-            except:
+            except TypeError:
                 self.callback()
                 
             self.call_count = self.call_count + 1

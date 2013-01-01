@@ -1,3 +1,5 @@
+import pygame
+
 class AudioModel(object):
     def __init__(self, resource):
         assert(resource.type == 'audio')
