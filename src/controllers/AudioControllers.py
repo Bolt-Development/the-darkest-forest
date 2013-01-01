@@ -6,6 +6,10 @@ class AudioController(object):
         self.model = model
     def play(self):
         self.model.sound.play()
+    def stop(self):
+        self.model.sound.stop()
+    def fade(self, time):
+        self.model.sound.fadeout(time)
 
 class AudioChannelController(object):
     def __init__(self, model):
@@ -17,8 +21,8 @@ class AudioChannelController(object):
     next_channel.current = 0
     
 
-    def play(self, filename):
-        # play the sound
+    def play(self, model, loops=0, maxtime=0, fade_ms=0
+        self.channel.play(model.sound, loops, maxtime, fade_ms)
 
 
 
