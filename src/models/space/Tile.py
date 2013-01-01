@@ -1,4 +1,7 @@
-from ..common.PubSub import *
+try:
+    from .common.PubSub import *
+except:
+    from common.PubSub import *
 
 
 class Tile(PubSub):

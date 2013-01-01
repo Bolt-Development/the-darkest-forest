@@ -1,4 +1,7 @@
-from ..common.PubSub import *
+try :
+    from ..common.PubSub import *
+except:
+    from common.PubSub import *
 class Grid(PubSub):
     def __init__(self, width, height, columns, rows):
         PubSub.__init__(self)
