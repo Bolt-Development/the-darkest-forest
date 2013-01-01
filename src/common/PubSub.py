@@ -95,6 +95,10 @@ class Handler(PubSub):
                 self.callback(event, **kwargs)
             except TypeError:
                 self.callback()
+            except:
+                import sys
+                print "Unexpected error:", sys.exc_info()[0]
+                raise
                 
             self.call_count = self.call_count + 1
 

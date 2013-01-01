@@ -19,8 +19,7 @@ if __name__ == '__main__':
 
     def on_init(event, **kwargs):
         engine = kwargs['emitter']
-
-        resource = ResourceLoader.load_resource_by_name_type('spritesheet', 'image')
+        resource = ResourceLoader().load_resource_by_name_and_type('pixelland', 'image')
         model = SpriteSheetModel(resource)
         view = SpriteSheetView(model)
         
