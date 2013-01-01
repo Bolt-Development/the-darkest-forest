@@ -21,6 +21,21 @@ class GridView(object):
         column, row = self.position_to_column_row(x, y)
         if column and row:
             self.grid.tag('mouse_over', column, row)
+            
+    def on_mouse_down(self, event, **kwargs):
+        x, y  = kwargs['position']
+        column, row = self.position_to_column_row(x, y)
+        print kwargs
+        if column and row:
+            self.grid.tag('mouse_over', column, row)
+            
+        
+    def position_on_self(self, tile): 
+        x = self.x + (self.scale_x * tile.column * tile.width) + 1
+        y = self.y + (self.scale_y * tile.row * tile.height) + 1
+        w = self.scale_x * tile.width - 1
+        h = self.scale_y * tile.height - 1
+        return [x, y, w, h]
         
     def position_to_column_row(self, x, y):
         if x > self.x and x < self.x + self.width:
@@ -43,11 +58,7 @@ class GridView(object):
 
         mouse_over = self.grid.get_tag('mouse_over')
         if mouse_over:
-            x = self.x + (self.scale_x * mouse_over.column * mouse_over.width) + 1
-            y = self.y + (self.scale_y * mouse_over.row * mouse_over.height) + 1
-            w = self.scale_x * mouse_over.width - 1
-            h = self.scale_y * mouse_over.height - 1
-            pygame.draw.rect(surface, (0, 0, 255), [x, y, w, h])
+            pygame.draw.rect(surface, (0, 0, 255), self.position_on_self(mouse_over))
 
 if __name__ == '__main__':
     add_source_folder()
@@ -76,6 +87,9 @@ if __name__ == '__main__':
         
         engine.on('mouse_motion', view.on_mouse_moved)
         engine.on('mouse_motion', mini_view.on_mouse_moved)
+        
+        engine.on('mouse_down', view.on_mouse_down)
+        engine.on('mouse_down', mini_view.on_mouse_down)
 
     
     engine = Engine()

@@ -22,6 +22,8 @@ class Engine(PubSub):
     def init_flow_controls(self, value=False):
         self.active = value
         self.paused = value
+        
+        self.last_click_elapsed = [0 for x in xrange(12)]
 
     def _init_pygame(self):
         pygame.init()
@@ -86,6 +88,7 @@ class Engine(PubSub):
 
     def _tick(self, elapsed):
         self.emit('tick', elapsed = elapsed)
+        self.last_click_elapsed = [elapsed + x for x in self.last_click_elapsed]
 
     def _render(self):
         self.screen.fill((0, 0, 0), (0, 0, self.width, self.height))
@@ -124,7 +127,10 @@ class Engine(PubSub):
                 self.emit('mouse_up', position=event.pos, button=event.button)
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 any_input = True
-                self.emit('mouse_down', position=event.pos, button=event.button)
+                
+                old = self.last_click_elapsed[event.button]
+                self.last_click_elapsed[event.button] = 0
+                self.emit('mouse_down', position=event.pos, button=event.button, double= old < 200)
                 
 
         if not any_input:
