@@ -11,8 +11,7 @@ if __name__ == '__main__':
         print event, kwargs
 
     def init_audio(event, **kwargs):
-        pygame.mixer.init()
-        audio = AudioController(AudioModel("bomb.ogg"))
+        audio = AudioController()
         engine.on("w_down", audio.play)
 
     engine = Engine()
