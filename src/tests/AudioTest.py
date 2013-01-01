@@ -2,19 +2,22 @@ from TestingUtils import *
 
 if __name__ == '__main__':
     add_source_folder()
-    add_resource_folder()
 
     from models.Engine import *
     from models.AudioModels import *
     from controllers.AudioControllers import *
-    from ResourceLoader import *
 
-    resource = ResourceLoader().load_resource_by_name_and_type('bomb', 'audio')
+    def on_event(event, **kwargs):
+        print event, kwargs
 
     def init_audio(event, **kwargs):
-        audio = AudioController(AudioModel(resource))
+        pygame.mixer.init()
+        audio = AudioController(AudioModel("bomb.ogg"))
         engine.on("w_down", audio.play)
-        
+
     engine = Engine()
     engine.on("init", init_audio, memory=True)
+    engine.on('tick', on_event)
+    engine.on('render', on_event)
     engine.start()
+
