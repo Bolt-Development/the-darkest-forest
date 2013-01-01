@@ -1,5 +1,8 @@
 import pygame
-from .common.PubSub import *
+try:
+    from .common.PubSub import *
+except:
+    from common.PubSub import *
 
 class Engine(PubSub):
     def __init__(self, width=854, height=480):
