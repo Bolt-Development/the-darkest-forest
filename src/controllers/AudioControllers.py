@@ -8,18 +8,17 @@ class AudioController(object):
         self.model.sound.play()
 
 class AudioChannelController(object):
-    def __init__(self):
-        channel_1 = pygame.mixer.Channel(0)
-        channel_2 = pygame.mixer.Channel(1)
-        self.channels = [channel_1, channel_2]
-        self.queue = []
-        self.loaded_files = {}
+    def __init__(self, model):
+        self.model = model
+
+    def next_channel(self):
+        return pygame.mixer.Channel(next_channel.current)
+        next_channel.current += 1
+    next_channel.current = 0
+    
 
     def play(self, filename):
-        if filename not in self.loaded_files:
-            model = AudioModel(filename)
-            self.loaded_files[filename] = model
-        self.loaded_files[filename].sound.play()
+        # play the sound
 
 
 
