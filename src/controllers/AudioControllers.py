@@ -15,16 +15,10 @@ class AudioChannelController(object):
     def __init__(self, model):
         self.model = model
 
-    def next_channel(self):
-        channel = pygame.mixer.Channel(next_channel.current)
-        AudioChannelController.current += 1
-        return channel
-    
-
     def play(self, model, loops=0, maxtime=0, fade_ms=0):
-        self.channel.play(model.sound, loops, maxtime, fade_ms)
+        self.model.channel.play(model.sound, loops, maxtime, fade_ms)
 
-AudioChannelController.current = 0
+
 
 
 
