@@ -30,7 +30,8 @@ class Engine(PubSub):
 
     def _init_pygame(self):
         pygame.init()
-
+        pygame.mixer.init()
+        
         self.screen = pygame.display.set_mode([self.width, self.height])
 
     def init_font(self, fontsize=35):
