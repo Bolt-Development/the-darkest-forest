@@ -91,7 +91,11 @@ class Handler(PubSub):
 
     def handle(self, event, **kwargs):
         if self.message_type == event.message_type:
-            self.callback(event, **kwargs)
+            try:
+                self.callback(event, **kwargs)
+            except:
+                self.callback()
+                
             self.call_count = self.call_count + 1
 
             self.emit('callback')
