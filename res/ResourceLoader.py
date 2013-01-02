@@ -21,7 +21,6 @@ def get_type_by_ext(file):
 			return types[0]
 		
 	for interesting_type in interesting_types[5:7]:
-		print interesting_type
 		if fnmatch.fnmatch(file.lower(), r'*.'+interesting_type):
 			return types[1]
 		
