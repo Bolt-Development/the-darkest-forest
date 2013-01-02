@@ -11,7 +11,7 @@ class ParentChild(object):
             if child == self:
                 continue
             
-            self.children.append(child)
+            self._children.append(child)
             child.parent = self
             self.on_child_added(child)
             
@@ -21,7 +21,7 @@ class ParentChild(object):
                 continue
             
             if child in self.children:
-                self.children.remove(child)
+                self._children.remove(child)
                 child.parent = None
                 self.on_child_removed(child)
             
@@ -30,16 +30,16 @@ class ParentChild(object):
     children = property(_get_children)
     
     def _get_parent(self):
-        return self.parent
+        return self._parent
     def _set_parent(self, parent):
-        if parent == self or parent in self.children:
+        if parent == self or parent in self._children:
             return
         
-        if parent != self.parent:
-            self.parent.remove_child(self)
-        self.parent = parent
-        if parent is not None:
-            self.parent.add_child(self)
+        if parent != self._parent and self._parent is not None:
+            self._parent.remove_child(self)
+        self._parent = parent
+        if parent is not None and self not in parent.children:
+            self._parent.add_child(self)
         self.on_parent_changed(parent)
     parent = property(_get_parent, _set_parent)
     
@@ -51,3 +51,14 @@ class ParentChild(object):
     
     def on_parent_changed(self, parent):
         pass
+    
+if __name__ == '__main__':
+    node = ParentChild()
+    node2 = ParentChild()
+
+    node3 = ParentChild()
+
+    node2.add_child(node3)
+    node2.parent = node
+
+    print node.children
