@@ -17,3 +17,8 @@ class AudioChannelModel(object):
         return pygame.mixer.Channel(next_channel.current)
         next_channel.current += 1
     next_channel.current = 0
+
+class MusicModel(object):
+    def __init__(self, resource):
+        assert(resource.type == 'audio')
+        self.resource = resource

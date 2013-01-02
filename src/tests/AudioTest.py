@@ -13,7 +13,9 @@ if __name__ == '__main__':
 
     def init_audio(event, **kwargs):
         audio = AudioController(AudioModel(resource))
+        music = MusicController(MusicModel(resource))
         engine.on("w_down", audio.play)
+        engine.on("q_down", music.play)
         
     engine = Engine()
     engine.on("init", init_audio, memory=True)
