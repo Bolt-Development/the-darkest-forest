@@ -48,6 +48,21 @@ class PubSub(object):
     def once(self, message_type, callback):
         self.on(message_type, callback, 0)
 
+    def remove(self, message_type, callback):
+        try:
+            to_remove = []
+
+            for handler in self.handlers[message_type]:
+                if handler.callback == callback:
+                    to_remove.append(handler)
+
+            for remove in to_remove:
+                self.handlers[message_type].remove(remove)
+                
+            return len(to_remove) > 0
+        except:
+            return False
+
     def _parse_kwargs(self, **kwargs):
         return (guarded(lambda: kwargs['reason']) or 'none',
                 guarded(lambda: kwargs['message']) or 'none')
@@ -136,6 +151,10 @@ class LimitedHandler(Handler):
 if __name__ == '__main__':
     pb = PubSub()
 
+    def remove_test(event, **kwargs):
+        print 'this should never be called!'
+
+
     def on_hello_world(event, **kwargs):
         print 'hello, world: from', guarded(lambda:kwargs['emitter']) or 'no one'
 
@@ -149,6 +168,9 @@ if __name__ == '__main__':
     
     pb.on('hello_world', on_hello_world, repeats=12, condition=stop_at_three)
     pb.on('hello_world', on_hello_world, repeats=12)
+
+    pb.on('hello_world', remove_test)
+    pb.remove('hello_world', remove_test)
 
 
     for x in xrange(20):
