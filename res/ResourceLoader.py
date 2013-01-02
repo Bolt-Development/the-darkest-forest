@@ -4,7 +4,7 @@ import fnmatch
 
 import pygame
 
-interesting_types = ['jpg', 'jpeg', 'gif', 'bmp', 'png', 'ogg', 'wav']
+interesting_types = ['jpg', 'jpeg', 'gif', 'bmp', 'png', 'ogg', 'wav', 'ttf']
 def get_interesting_files(path):
     result = []
     for path, dirs, files in os.walk(path):
@@ -14,17 +14,19 @@ def get_interesting_files(path):
                     result.append(os.path.join(path, file))
     return result
 
-types = ['image', 'audio', 'other']
+types = ['image', 'audio', 'font', 'other']
 def get_type_by_ext(file):
-	for interesting_type in interesting_types[0:5]:
-		if fnmatch.fnmatch(file.lower(), r'*.'+interesting_type):
-			return types[0]
+    for interesting_type in interesting_types[0:5]:
+	if fnmatch.fnmatch(file.lower(), r'*.'+interesting_type):
+	    return types[0]
 		
-	for interesting_type in interesting_types[5:7]:
-		if fnmatch.fnmatch(file.lower(), r'*.'+interesting_type):
-			return types[1]
-		
+    for interesting_type in interesting_types[5:7]:
+	if fnmatch.fnmatch(file.lower(), r'*.'+interesting_type):
+	    return types[1]
+		    
+    if fnmatch.fnmatch(file.lower(), r'*.ttf'):
 	return types[2]
+    return types[-1]
 			
 class ResourceLoader(object):
     def __init__(self):
@@ -54,5 +56,7 @@ class Resource(object):
             return pygame.image.load(self.path)
         elif self.type == 'sound':
             return pygame.mixer.Sound(self.path)
+        elif self.type == 'font':
+            return pygame.font.Font(self.path)
         else:
             return self.path
