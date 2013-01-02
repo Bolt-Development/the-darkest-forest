@@ -1,9 +1,15 @@
 from PubSub import *
 import pygame
 
-class SceneModel(PubSub):
-    def __init__(self):
+class Scene(PubSub):
+    def __init__(self, width, height, x = 0, y = 0):
         PubSub.__init__(self)
+        
+        self.width = width
+        self.height = height
+        self.x, self.y = x, y
+        
+        self.initialized = False
         
     def init(self):    
         self.active = False
@@ -14,9 +20,16 @@ class SceneModel(PubSub):
         self.last = None
         self.next = None
         
+        self.initialized = True
+        self.emit('init', emitter = self)
+        
+    def enter(self, last):
+        self.last = last
+        
+        
 
-class SceneController(object):
-    def __init__(self, model):
+class Transition(PubSub):
+    def __init__(self):
         self.model = model
         
     def enter(self, last):
