@@ -25,6 +25,9 @@ class PubSub(object):
 
         # only remembers last arguments
         self.memory[message_type]=kwargs
+        
+        # allows subscribers to hear everything
+        self.emit('every', **kwargs)
 
     def on(
             self,
