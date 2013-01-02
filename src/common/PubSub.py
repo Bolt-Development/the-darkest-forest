@@ -9,6 +9,12 @@ class PubSub(object):
 
     def emit(self, message_type, **kwargs):
         if message_type in self.handlers:
+            self.__emit_to_handlers(message_type, **kwargs)
+            
+        # only remembers last arguments
+        self.memory[message_type]=kwargs
+            
+    def __emit_to_handlers(self, message_type, **kwargs):
             handlers = self.handlers[message_type]
             to_remove = []
 
@@ -22,12 +28,8 @@ class PubSub(object):
 
             for finished in to_remove:
                 handlers.remove(finished)
-
-        # only remembers last arguments
-        self.memory[message_type]=kwargs
+                
         
-        # allows subscribers to hear everything
-        self.emit('every', **kwargs)
 
     def on(
             self,

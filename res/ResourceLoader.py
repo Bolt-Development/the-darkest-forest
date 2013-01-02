@@ -4,7 +4,7 @@ import fnmatch
 
 import pygame
 
-interesting_types = ['jpg', 'jpeg', 'gif', 'bmp', 'png', 'ogg', 'wav', 'ttf']
+interesting_types = ['jpg', 'jpeg', 'gif', 'bmp', 'png', 'ogg', 'wav', 'ttf', 'mp3']
 def get_interesting_files(path):
     result = []
     for path, dirs, files in os.walk(path):
@@ -14,19 +14,23 @@ def get_interesting_files(path):
                     result.append(os.path.join(path, file))
     return result
 
-types = ['image', 'audio', 'font', 'other']
+types = ['image', 'audio', 'font', 'other', 'music']
 def get_type_by_ext(file):
     for interesting_type in interesting_types[0:5]:
-	if fnmatch.fnmatch(file.lower(), r'*.'+interesting_type):
-	    return types[0]
-		
+        if fnmatch.fnmatch(file.lower(), r'*.'+interesting_type):
+            return types[0]
+        
     for interesting_type in interesting_types[5:7]:
-	if fnmatch.fnmatch(file.lower(), r'*.'+interesting_type):
-	    return types[1]
-		    
+        if fnmatch.fnmatch(file.lower(), r'*.'+interesting_type):
+            return types[1]
+            
     if fnmatch.fnmatch(file.lower(), r'*.ttf'):
-	return types[2]
-    return types[-1]
+        return types[2]
+    
+    if fnmatch.fnmatch(file.lower(), r'*.mp3'):
+        return types[4]
+    
+    return types[3]
 			
 class ResourceLoader(object):
     def __init__(self):
