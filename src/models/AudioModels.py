@@ -5,9 +5,20 @@ class AudioModel(object):
         assert(resource.type == 'audio')
         
         self.resource = resource
-        self.sound = pygame.mixer.Sound(self.resource.filepath)
-        self.length = self.sound.get_length()
-        self.buffer = self.sound.get_buffer()
+        self.__sound = None
+
+    def _get_sound(self):
+        if self.__sound is not None:
+            return self.__sound
+        
+        self.__sound = self.resource.load()
+        self.length = self.__sound.get_length()
+        self.buffer = self.__sound.get_buffer()
+        
+        return self.__sound
+
+        
+    sound = property(_get_sound)
         
 class AudioChannelModel(object):
     def __init__(self):
@@ -17,8 +28,3 @@ class AudioChannelModel(object):
         return pygame.mixer.Channel(next_channel.current)
         next_channel.current += 1
     next_channel.current = 0
-
-class MusicModel(object):
-    def __init__(self, resource):
-        assert(resource.type == 'audio')
-        self.resource = resource

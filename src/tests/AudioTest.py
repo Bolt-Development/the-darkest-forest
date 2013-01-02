@@ -12,10 +12,11 @@ if __name__ == '__main__':
     resource = ResourceLoader().load_resource_by_name_and_type('bomb', 'audio')
 
     def init_audio(event, **kwargs):
-        audio = AudioController(AudioModel(resource))
-        music = MusicController(MusicModel(resource))
+        model = AudioModel(resource)
+        audio = AudioController(model)
+        music = MusicController(model)
         engine.on("w_down", audio.play)
-        engine.on("q_down", music.play)
+        engine.on("q_down", lambda:music.play(loops=3))
         
     engine = Engine()
     engine.on("init", init_audio, memory=True)

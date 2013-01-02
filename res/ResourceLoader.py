@@ -54,7 +54,7 @@ class Resource(object):
     def load(self):
         if self.type == 'image':
             return pygame.image.load(self.path)
-        elif self.type == 'sound':
+        elif self.type == 'audio':
             return pygame.mixer.Sound(self.path)
         elif self.type == 'font':
             return pygame.font.Font(self.path)
