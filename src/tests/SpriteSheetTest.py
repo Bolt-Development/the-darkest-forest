@@ -15,8 +15,11 @@ class SpriteSheetView(object):
         width = self.model.surface.get_width() * self.scale_x
         height = self.model.surface.get_height() * self.scale_y
 
+        modified = self.model.surface.copy()
+        modified = pygame.transform.scale(modified, (width, height))
+
         pygame.Surface.blit(surface,
-                            self.model.surface,
+                            modified,
                             [self.x, self.y, width, height])
 
         
@@ -34,6 +37,8 @@ if __name__ == '__main__':
         resource = ResourceLoader().load_resource_by_name_and_type('pixelland', 'image')
         model = SpriteSheetModel(resource)
         view = SpriteSheetView(model)
+        view.scale_x = 2.4
+        view.scale_y = 2.4
         
         engine.on('render', view.on_render)
 
