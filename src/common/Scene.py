@@ -1,15 +1,21 @@
 from PubSub import *
+from ParentChild import *
 import pygame
 
-class Scene(PubSub):
-    def __init__(self, width, height, x = 0, y = 0):
+class Scene(PubSub, ParentChild):
+    def __init__(self, parent):
         PubSub.__init__(self)
+        ParentChild.__init__(self)
         
-        self.width = width
-        self.height = height
-        self.x, self.y = x, y
+        self._width = self._height = self._x = self._y = 0
+        
+        self._surface = False
+        self._stage = False
+        
+        self.on_stage = False
         
         self.initialized = False
+        self.transitioning = False
         
     def init(self):    
         self.active = False
@@ -24,15 +30,50 @@ class Scene(PubSub):
         self.emit('init', emitter = self)
         
     def enter(self, last):
+        if not self.initialized:
+            self.init()
         self.last = last
+        self.emit('entered', last = last)
         
+    def exit(self, next):
+        self.next = next
+        self.emit('exited', next = next)
         
-
-class Transition(PubSub):
-    def __init__(self):
-        self.model = model
+    def _get_surface(self):
+        if self._surface:
+            return self._surface
         
-    def enter(self, last):
-        if self.last == last:
-            
+        self._surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+        return self._surface
+    surface = property(_get_surface)
     
+    def _get_stage(self):
+        return self._stage or None
+    
+    def _set_stage(self, stage):
+        if self._stage:
+            self.on_removed_from_stage()
+            
+        self._stage = stage
+        self.on_added_to_stage()
+    stage = property(_get_stage, _set_stage)
+    
+    def on_added_to_stage(self):
+        self.emit('added_to_stage', stage = self.stage)
+        for child in self.children:
+            chile.on_added_to_stage()
+        self.on_stage = True
+        
+    def on_removed_from_stage(self):
+        self.emit('removed_from_stage', stage = self.stage)
+        
+    def on_child_added(self, child):
+        self.emit('child_added', child = child)
+    
+    def on_child_removed(self):
+        self.emit('child_removed', child = child)
+    
+    def on_parent_changed(self, parent):
+        if isinstance(parent, Stage):
+            self.stage = parent
+        
