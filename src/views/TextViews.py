@@ -3,6 +3,7 @@ from .common.PubSub import *
 from .models.TextModels import *
 
 import pygame
+import sys
 
 class TextView(PubSub):
     def __init__(self, model):
@@ -129,6 +130,7 @@ class ParagraphView(PubSub):
         self._model = model
         
         self._model.on('change', self.change_model)
+        self._min_width = sys.maxint
         
         self._width = width
         self._x = self._y = self._height = 0
@@ -144,30 +146,38 @@ class ParagraphView(PubSub):
     def clean_up(self):
         txt = self._model.text
         
+        self.clear_subs('render')
+        self.clear_subs('mouse_motion')
+        
         x, y = 0, 0
         for line in txt.split('\n'):
             for word in line.split():
                 if len(word.strip()) == 0:
                     continue
                 
-                child = TextView(TextModel(self._model.resource, word, self._model.height))
-                child.on('change', self.make_dirty)
+                view = TextView(TextModel(self._model.resource, word, self._model.height))
+                view.on('change', self.make_dirty)
                 
-                x += child.width + self._offset_x
-                if x > self._width:
+                next_x = x + view.width + (self._offset_x * 2.0)
+                if next_x > self._width:
                     y += self._model.size + self._offset_y
                     x = 0
                     
-                child.x = x - child.width
-                child.y = y
+                view.x = x + self._offset_x
+                view.y = y
                 
-                self.on('render', child.on_render)
-                self.on('mouse_motion', child.on_mouse_motion)
+                x += view.width + self._offset_x
                 
-                self.emit('word_added', word = word, view = child, rect = (x, y, child.width, child.height))
+                self._min_width = min(view.width, self._min_width)
+                
+                self.on('render', view.on_render)
+                self.on('mouse_motion', view.on_mouse_motion)
+                
+                self.emit('word_added', word = word, view = view, rect = (x, y, view.width, view.height))
             y += self._model.size + self._offset_y
             x = 0
                 
+        self._width = max(self._width, self._min_width)
         self._height = y + self._model.height + self._offset_y
         self._surface = pygame.Surface((self._width, self._height), pygame.SRCALPHA)
         self.dirty = False
@@ -176,7 +186,7 @@ class ParagraphView(PubSub):
         if self.dirty:
             self.clean_up()
         
-        self._surface.fill((0, 0, 0, 255), (self._x, self._y, self._width, self._height))
+        self._surface.fill((0, 0, 255, 45), (self._x, self._y, self._width, self._height))
         self.emit('render', surface = self._surface)
             
         surface = kwargs['surface']
@@ -189,3 +199,13 @@ class ParagraphView(PubSub):
         if x > self._x and x < self._x + self._width and y > self._y and y < self._y + self._height:
             local = x - self._x, y - self._y
             self.emit('mouse_motion', position = local)
+            
+    def _get_width(self):
+        return self._width
+    def _set_width(self, value):
+        self._width = value
+        if self._width < 0:
+            self._width = 0
+        self.make_dirty()
+    width = property(_get_width, _set_width)
+            

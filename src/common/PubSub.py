@@ -10,6 +10,9 @@ class PubSub(object):
         self.handlers = {}
         self.conditions = {}
         self.memory = {}
+        
+    def clear_subs(self, message_type):
+        self.handlers[message_type] = []
 
     def emit(self, message_type, **kwargs):
         if message_type in self.handlers:
