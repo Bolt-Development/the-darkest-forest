@@ -8,6 +8,10 @@ class TextModel(PubSub):
         self.load_font(resource, size)
         self.set_text(text)
         
+    def get_resource(self):
+        return self._resource
+    resource = property(get_resource)
+    
     def load_font(self, resource, size):
         self._resource = resource
         self._font = resource.load(size=size)

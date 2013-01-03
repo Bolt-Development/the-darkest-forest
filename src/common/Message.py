@@ -9,10 +9,12 @@ class Message(object):
         self.reason = reason
 
     def __repr__(self):
-        return ' '.join([self.message_type or 'no_type',
+        return ' '.join(['[Message:',
+                         self.message_type or 'no_type',
                          self.message or 'no_message',
                          str(self.timestamp),
-                         self.reason or 'no_reason'])
+                         self.reason or 'no_reason',
+                        ']'])
 
 
 if __name__ == '__main__':

@@ -24,6 +24,10 @@ class ParentChild(object):
                 self._children.remove(child)
                 child.parent = None
                 self.on_child_removed(child)
+                
+    def clear_children(self):
+        copy = [x for x in self._children]
+        [self.remove_child(x) for x in copy]
             
     def _get_children(self):
         return self._children
@@ -32,6 +36,7 @@ class ParentChild(object):
     def _get_parent(self):
         return self._parent
     def _set_parent(self, parent):
+        old_parent = self._parent
         if parent == self or parent in self._children:
             return
         
@@ -40,7 +45,7 @@ class ParentChild(object):
         self._parent = parent
         if parent is not None and self not in parent.children:
             self._parent.add_child(self)
-        self.on_parent_changed(parent)
+        self.on_parent_changed(parent, old_parent)
     parent = property(_get_parent, _set_parent)
     
     def on_child_added(self, child):
@@ -49,7 +54,7 @@ class ParentChild(object):
     def on_child_removed(self):
         pass
     
-    def on_parent_changed(self, parent):
+    def on_parent_changed(self, parent, old_parent):
         pass
     
 if __name__ == '__main__':

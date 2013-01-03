@@ -34,14 +34,7 @@ if __name__ == '__main__':
         import random
         font = fonts[random.randint(0, len(fonts) - 1)]
         model = TextModel(font, text=long_string)
-        def mouse_over():
-            model.color = (0, 0, 255)
-        def mouse_exit():
-            model.color = (255, 255, 255)
-            
-        view = TextView(model)
-        view.on('mouse_enter', mouse_over)
-        view.on('mouse_exit',  mouse_exit)
+        view = ParagraphView(model)
 
         engine.on('render', view.on_render)
         engine.on('mouse_motion', view.on_mouse_motion)

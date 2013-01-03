@@ -1,4 +1,6 @@
 import sys
+import traceback
+import inspect
 
 from Message import *
 from Guard import *
@@ -31,8 +33,6 @@ class PubSub(object):
             for finished in to_remove:
                 handlers.remove(finished)
                 
-        
-
     def on(
             self,
             message_type,
@@ -107,6 +107,9 @@ class Handler(PubSub):
         PubSub.__init__(self)
 
         self.message_type = message_type
+        self.args, __, self.keywords, __ = inspect.getargspec(callback)
+        self.num_args = len(self.args)
+        self.uses_keywords = self.keywords is not None
         
         self.callback = callback
         self.call_count = 0
@@ -114,15 +117,18 @@ class Handler(PubSub):
     def handle(self, event, **kwargs):
         if self.message_type == event.message_type:
             try:
-                self.callback(event, **kwargs)
-            except TypeError:
-                try:
+                if self.num_args == 0:
                     self.callback()
-                except Exception as e:
-                    print "Unexpected error:", sys.exc_info()[0]
-                    print e
+                elif self.num_args == 2 or self.num_args == 1:
+                    if self.uses_keywords:
+                        self.callback(event, **kwargs)
+                    else:
+                        self.callback(event)
+                else:
+                    print 'strange number of arguements', self.num_args, self.uses_keywords, event, kwargs
             except Exception as e:
                 print "Unexpected error:", sys.exc_info()[0]
+                traceback.print_exc(file=sys.stdout)
                 print e
             self.call_count = self.call_count + 1
 
