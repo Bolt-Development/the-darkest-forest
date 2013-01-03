@@ -1,3 +1,5 @@
+import sys
+
 from Message import *
 from Guard import *
 
@@ -114,12 +116,14 @@ class Handler(PubSub):
             try:
                 self.callback(event, **kwargs)
             except TypeError:
-                self.callback()
-            except:
-                import sys
+                try:
+                    self.callback()
+                except Exception as e:
+                    print "Unexpected error:", sys.exc_info()[0]
+                    print e
+            except Exception as e:
                 print "Unexpected error:", sys.exc_info()[0]
-                raise
-                
+                print e
             self.call_count = self.call_count + 1
 
             self.emit('callback')

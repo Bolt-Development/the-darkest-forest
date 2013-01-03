@@ -55,12 +55,17 @@ class Resource(object):
         self.name, self.extension = os.path.basename(path).split('.')
         self.type = get_type_by_ext(path)
 
-    def load(self):
+    def load(self, **kwargs):
         if self.type == 'image':
             return pygame.image.load(self.path)
         elif self.type == 'audio':
             return pygame.mixer.Sound(self.path)
         elif self.type == 'font':
-            return pygame.font.Font(self.path)
+            size = 14
+            try:
+                size = kwargs['size']
+            except:
+                pass
+            return pygame.font.Font(self.path, size)
         else:
             return self.path

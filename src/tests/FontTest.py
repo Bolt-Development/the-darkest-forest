@@ -8,12 +8,43 @@ if __name__ == '__main__':
     from models.Engine import *
     from models.TextModels import *
 
+    from views.TextViews import *
+
     from ResourceLoader import *
+
+    long_string = \
+        """
+            Jack Spicer: How many times can I say "my bad"? 
+
+            Omi: I soon realized that the only way to return to the future was to wait. 
+            [Clay, Kimiko and Jack's jaws drop] 
+            Kimiko: You waited for a thousand years? 
+            Omi: Exactly. 
+            Kimiko: But you don't have wrinkles or liver spots, or... 
+            Jack Spicer: Or that old people smell. 
+            [Kimiko smacks him] 
+            Jack Spicer: OW!
+        """
 
     def on_init(event, **kwargs):
         engine = kwargs['emitter']
+        
         fonts = ResourceLoader().load_resources_by_type('font')
-        print fonts
+
+        import random
+        font = fonts[random.randint(0, len(fonts) - 1)]
+        model = TextModel(font, text=long_string)
+        def mouse_over():
+            model.color = (0, 0, 255)
+        def mouse_exit():
+            model.color = (255, 255, 255)
+            
+        view = TextView(model)
+        view.on('mouse_enter', mouse_over)
+        view.on('mouse_exit',  mouse_exit)
+
+        engine.on('render', view.on_render)
+        engine.on('mouse_motion', view.on_mouse_motion)
 
     
     engine = Engine()
