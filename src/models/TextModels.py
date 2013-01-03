@@ -16,7 +16,10 @@ class TextModel(PubSub):
         self._resource = resource
         self._font = resource.load(size=size)
         self._size = size
-        self.emit('change')
+        try:
+            self.set_text(self._text)
+        except:
+            self.set_text('')
     def get_font(self):
         return self._font
     font = property(get_font)

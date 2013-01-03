@@ -20,6 +20,7 @@ class TextView(PubSub):
         self._surface = None
         
         self._mouse_over = False
+        self._mouse_down = False
         self._last_known_mouse = None
         
         self.dirty = True
@@ -74,6 +75,24 @@ class TextView(PubSub):
         
         blitter(surface, self._surface, (self._x, self._y, self._width, self._height))
         
+    def on_mouse_down(self, event, **kwargs):
+        x, y = kwargs['position']
+        if self._mouse_over:
+            local = x - self._x, y - self._y
+            self._mouse_down = True  # mouse went down inside me
+            self.emit('mouse_down', button = kwargs['button'], position = local)
+        else:
+            self._mouse_down = False
+            
+    def on_mouse_up(self, event, **kwargs):
+        x, y = kwargs['position']
+        local = x - self._x, y - self._y
+        if self._mouse_over:
+            if self._mouse_down: # mouse went down and came up inside me = click!
+                self.emit('mouse_up', position = local, button = kwargs['button'])
+                self.emit('clicked', emitter = self, button = kwargs['button'], position = local)
+                self._mouse_down = False
+            
     def on_mouse_motion(self, event, **kwargs):
         position = kwargs['position']
         self._last_known_mouse = position
@@ -87,12 +106,12 @@ class TextView(PubSub):
         if x > self._x and x < (self._x + self._width) and  y > self._y and y < (self._y + self._height):
             if not self._mouse_over:
                 self._mouse_over = True
-                self.emit('mouse_enter')
-            self.emit('mouse_over')
+                self.emit('mouse_enter', emitter = self)
+            self.emit('mouse_over', emitter = self)
         else:
             if self._mouse_over:
                 self._mouse_over = False
-                self.emit('mouse_exit')
+                self.emit('mouse_exit', emitter = self)
                 
     def _get_x(self):
         return self._x
@@ -120,6 +139,18 @@ class TextView(PubSub):
             
         return self._height
     
+    def _get_text(self):
+        return self._model.text
+    def _set_text(self, text):
+        self._model.text = text
+    text = property(_get_text, _set_text)
+    
+    def _get_color(self):
+        return self._model.color
+    def _set_color(self, value):
+        self._model.set_color(value)
+    color = property(_get_color, _set_color)
+    
     width = property(_get_width)
     height = property(_get_height)
         
@@ -129,6 +160,9 @@ class ParagraphView(PubSub):
         
         self._model = model
         
+        self.last_known_mouse = None
+        self._mouse_down = False
+        
         self._model.on('change', self.change_model)
         self._min_width = sys.maxint
         
@@ -137,7 +171,7 @@ class ParagraphView(PubSub):
         self._offset_x = self._offset_y = 3
         self.dirty = True
         
-    def change_model(self):
+    def change_model(self, event, **kwargs):
         self.make_dirty()
         
     def make_dirty(self):
@@ -148,8 +182,11 @@ class ParagraphView(PubSub):
         
         self.clear_subs('render')
         self.clear_subs('mouse_motion')
+        self.clear_subs('mouse_down')
+        self.clear_subs('mouse_up')
         
-        x, y = 0, 0
+        view = None
+        x, y = self._offset_x, self._offset_y
         for line in txt.split('\n'):
             for word in line.split():
                 if len(word.strip()) == 0:
@@ -160,8 +197,8 @@ class ParagraphView(PubSub):
                 
                 next_x = x + view.width + (self._offset_x * 2.0)
                 if next_x > self._width:
-                    y += self._model.size + self._offset_y
-                    x = 0
+                    y += view.height+ self._offset_y
+                    x = self._offset_x
                     
                 view.x = x + self._offset_x
                 view.y = y
@@ -172,21 +209,27 @@ class ParagraphView(PubSub):
                 
                 self.on('render', view.on_render)
                 self.on('mouse_motion', view.on_mouse_motion)
+                self.on('mouse_down', view.on_mouse_down)
+                self.on('mouse_up', view.on_mouse_up)
                 
                 self.emit('word_added', word = word, view = view, rect = (x, y, view.width, view.height))
-            y += self._model.size + self._offset_y
-            x = 0
+            if view is not None:
+                y += view.height + self._offset_y
+            x = self._offset_x
                 
         self._width = max(self._width, self._min_width)
-        self._height = y + self._model.height + self._offset_y
+        self._height = y + self._offset_y
         self._surface = pygame.Surface((self._width, self._height), pygame.SRCALPHA)
+        
+        if self.last_known_mouse is not None:
+            self.emit('mouse_motion', position = self.last_known_mouse)
         self.dirty = False
     
     def on_render(self, event, **kwargs):
         if self.dirty:
             self.clean_up()
         
-        self._surface.fill((0, 0, 255, 45), (self._x, self._y, self._width, self._height))
+        self._surface.fill((0, 0, 255, 45), (0, 0, self._width, self._height))
         self.emit('render', surface = self._surface)
             
         surface = kwargs['surface']
@@ -194,11 +237,32 @@ class ParagraphView(PubSub):
         
         blitter(surface, self._surface, (self._x, self._y, self._width, self._height))
         
+    def on_mouse_down(self, event, **kwargs):
+        x, y = kwargs['position']
+        if x > self._x and x < self._x + self._width and y > self._y and y < self._y + self._height:
+            local = x - self._x, y - self._y
+            self._mouse_down = True  # mouse went down inside me
+            self.emit('mouse_down', button = kwargs['button'], position = local)
+        else:
+            self._mouse_down = False
+            
+    def on_mouse_up(self, event, **kwargs):
+        x, y = kwargs['position']
+        local = x - self._x, y - self._y
+        if x > self._x and x < self._x + self._width and y > self._y and y < self._y + self._height:
+            if self._mouse_down: # mouse went down and came up inside me = click!
+                self.emit('mouse_up', position = local, button = kwargs['button'])
+                self.emit('clicked', emitter = self, button = kwargs['button'], position = local)
+                self._mouse_down = False
+        
     def on_mouse_motion(self, event, **kwargs):
         x, y = kwargs['position']
         if x > self._x and x < self._x + self._width and y > self._y and y < self._y + self._height:
             local = x - self._x, y - self._y
+            self.last_known_mouse = local
             self.emit('mouse_motion', position = local)
+        else:
+            self._mouse_down = False
             
     def _get_width(self):
         return self._width
@@ -208,4 +272,24 @@ class ParagraphView(PubSub):
             self._width = 0
         self.make_dirty()
     width = property(_get_width, _set_width)
+    
+    def _get_fontsize(self):
+        return self._model.size
+    def _set_size(self, value):
+        self._model.load_font(self._model.resource, value)
+    fontsize = property(_get_fontsize, _set_size)
+    
+    def _get_x(self):
+        return self._x
+    def _set_x(self, value):
+        self._x = value
+        self.dirty = True
+    x = property(_get_x, _set_x)
+    
+    def _get_y(self):
+        return self._y
+    def _set_y(self, value):
+        self._y = value
+        self.dirty = True
+    y = property(_get_y, _set_y)
             

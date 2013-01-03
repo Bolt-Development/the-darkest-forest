@@ -110,7 +110,7 @@ class Handler(PubSub):
         PubSub.__init__(self)
 
         self.message_type = message_type
-        self.args, __, self.keywords, __ = inspect.getargspec(callback)
+        self.args, self.varargs, self.keywords, self.defaults = inspect.getargspec(callback)
         self.num_args = len(self.args)
         self.uses_keywords = self.keywords is not None
         
@@ -122,7 +122,7 @@ class Handler(PubSub):
             try:
                 if self.num_args == 0:
                     self.callback()
-                elif self.num_args == 2 or self.num_args == 1:
+                elif self.num_args > 0:
                     if self.uses_keywords:
                         self.callback(event, **kwargs)
                     else:

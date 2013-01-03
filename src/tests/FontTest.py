@@ -29,6 +29,25 @@ if __name__ == '__main__':
             Jack Spicer: OW!
         """
 
+    def on_enter(event, **kwargs):
+        view = kwargs['emitter']
+        view._model.color = (0, 0, 255)
+
+    def on_exit(event, **kwargs):
+        view = kwargs['emitter']
+        view._model.color = (255, 255, 255)
+
+    def on_click(event, **kwargs):
+        view = kwargs['emitter']
+        print 'you clicked', view.text
+        
+
+    def on_word_added(event, **kwargs):
+        view = kwargs['view']
+        view.on('mouse_enter', on_enter)
+        view.on('mouse_exit', on_exit)
+        view.on('clicked', on_click)
+
     def on_init(event, **kwargs):
         engine = kwargs['emitter']
         
@@ -38,12 +57,22 @@ if __name__ == '__main__':
         font = fonts[random.randint(0, len(fonts) - 1)]
         model = TextModel(font, text=long_string, size=24)
         view = ParagraphView(model)
+        view.on('word_added', on_word_added)
+        
+        view.x = 30
+        view.y = 13
 
         def on_right():
             view.width += 10
 
         def on_left():
             view.width -= 10
+
+        def on_up():
+            view.fontsize += 1
+
+        def on_down():
+            view.fontsize -= 1
 
         y = engine.height
         for instruction in instructions:
@@ -60,6 +89,10 @@ if __name__ == '__main__':
         engine.on('mouse_motion', view.on_mouse_motion)
         engine.on('left_down', on_left)
         engine.on('right_down', on_right)
+        engine.on('up_down', on_up)
+        engine.on('down_down', on_down)
+        engine.on('mouse_down', view.on_mouse_down)
+        engine.on('mouse_up', view.on_mouse_up)
 
     
     engine = Engine()
