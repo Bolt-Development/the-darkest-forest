@@ -10,11 +10,11 @@ if __name__ == '__main__':
     from ResourceLoader import *
 
     resource = ResourceLoader().load_resource_by_name_and_type('bomb', 'audio')
-    music_resources = ResourceLoader().load_resources_by_type('music')
+    music_resources = ResourceLoader().load_resources_by_type('audio')
     
     def init_audio(event, **kwargs):
         model = AudioModel(resource)
-        music_model = AudioModel(music_resources[0])
+        music_model = AudioModel(music_resources[2])
         
         audio = AudioController(model)
         music = MusicController(music_model)
