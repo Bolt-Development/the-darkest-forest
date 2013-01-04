@@ -8,7 +8,7 @@ class Timer(PubSub):
         self.infinite = False
         self.infinite_repeats = False
         
-    def start(self, update_emitter, delay, duration, interval=0, repeats='infinite', message_type='tick'):
+    def start(self, update_emitter, delay=0, duration='infinite', interval=0, repeats='infinite', message_type='tick'):
         if self.running:
             return    # consider runtime error
         
@@ -51,7 +51,7 @@ class Timer(PubSub):
                 if self.interval_time >= self.interval:
                     self.interval_time = 0
                     if self.infinite_repeats or self.call_count < self.repeats:
-                        self.emit('tick')
+                        self.emit('tick', elapsed = elapsed)
                         self.call_count += 1
                     else:
                         self.stop('finished')

@@ -12,7 +12,7 @@ if __name__ == '__main__':
     def init_audio(event, **kwargs):
         timer = Timer()
         timer.on('tick', on_tick)
-        timer.start(engine, 2000, 10000, interval=1000)
+        timer.start(engine, 2000, interval=1000)
         
     engine = Engine()
     engine.on("init", init_audio, memory=True)
