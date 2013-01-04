@@ -6,12 +6,13 @@ if __name__ == '__main__':
 
     from models.Engine import *
     from models.AnimationModels import *
+    from models.ImageModels import *
     from controllers.AnimationControllers import *
     from views.AnimationViews import *
     from ResourceLoader import *
 
     spritesheet_resource = ResourceLoader().load_resource_by_name_and_type('pixelland', 'image')
-    animation_model = AnimationModel
+    animation_model = AnimationModel(spritesheet_resource, (10,10))
     animation_controller = AnimationController(animation_model)
     animation_view = AnimationView()
 
