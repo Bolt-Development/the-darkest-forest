@@ -16,7 +16,7 @@ class SpriteSheetView(object):
         height = self.model.surface.get_height() * self.scale_y
 
         modified = self.model.surface.copy()
-        modified = pygame.transform.scale(modified, (width, height))
+        modified = pygame.transform.scale(modified, [int(x) for x in (width, height)])
 
         pygame.Surface.blit(surface,
                             modified,

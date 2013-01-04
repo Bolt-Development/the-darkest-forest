@@ -31,11 +31,11 @@ if __name__ == '__main__':
 
     def on_enter(event, **kwargs):
         view = kwargs['emitter']
-        view._model.color = (0, 0, 255)
+        view.color = (0, 0, 255)
 
     def on_exit(event, **kwargs):
         view = kwargs['emitter']
-        view._model.color = (255, 255, 255)
+        view.color = (255, 255, 255)
 
     def on_click(event, **kwargs):
         view = kwargs['emitter']
