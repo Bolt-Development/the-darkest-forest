@@ -35,8 +35,16 @@ if __name__ == '__main__':
     def on_init(event, **kwargs):
         engine = kwargs['emitter']
         resource = ResourceLoader().load_resource_by_name_and_type('pixelland', 'image')
+        print resource
+        print resource.type
+        print resource.name
+        print resource.path
+        
         model = SpriteSheetModel(resource)
+        print model
+        
         view = SpriteSheetView(model)
+        print view
         view.scale_x = 2.4
         view.scale_y = 2.4
         
