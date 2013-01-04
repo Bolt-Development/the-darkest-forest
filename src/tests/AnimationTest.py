@@ -10,19 +10,16 @@ if __name__ == '__main__':
     from controllers.AnimationControllers import *
     from views.AnimationViews import *
     from ResourceLoader import *
-    from common.Timer import *
+    
     def init_animation():
-        animation_timer = Timer()
-        animation_timer.start(engine)
+        animation_timer = AnimationController.init(engine)
         
-        spritesheet_resource = ResourceLoader().load_resource_by_name_and_type('pixelland', 'image')
-        animation_model = AnimationModel(spritesheet_resource, (10,10))
+        spritesheet_resource = ResourceLoader().load_resource_by_name_and_type('explosion', 'image')
+        animation_model = AnimationModel(spritesheet_resource, (0, 0), (282, 238), 10)
         animation_controller = AnimationController(animation_model)
-        animation_view = AnimationView()
+        animation_view = AnimationView(animation_model)
         
-        timer = Timer()
-        timer.on("tick", animation_controller.next)
-        timer.start(animation_timer, interval = 1000)
+        animation_controller.start()
 
         engine.on("render", animation_view.on_render)
 

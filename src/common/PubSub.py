@@ -123,7 +123,7 @@ class Handler(PubSub):
                 if self.num_args == 0:
                     self.callback()
                 elif self.num_args >= 1:
-                    if self.num_args == 1 and self.args[0] == 'self':
+                    if self.num_args == 1 and (self.args[0] == 'self' or self.args[0] == 'cls'):
                         self.callback()
                     elif self.uses_keywords:
                         self.callback(event, **kwargs)

@@ -2,6 +2,7 @@ try:
     from .common.PubSub import *
 except:
     from common.PubSub import*
+    
 class TextModel(PubSub):
     def __init__(self, resource, text="", size=14):
         PubSub.__init__(self)
