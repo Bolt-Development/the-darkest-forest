@@ -58,7 +58,7 @@ class Timer(PubSub):
             elif not self.infinite and ticks > self.time_to_stop:
                 self.stop('finished')
                 
-    def stop(self, message_type='stapped'):
+    def stop(self, message_type='stopped'):
         self.emit(message_type)
         self.running = False
         self.time_last_stopped = pygame.time.get_ticks()
