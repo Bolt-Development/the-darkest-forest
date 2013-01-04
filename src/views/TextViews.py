@@ -1,6 +1,12 @@
-from .common.PubSub import *
+try:
+    from .common.PubSub import *
+except:
+    from common.PubSub import *
+try:
+    from .models.TextModels import *
+except:
+    from models.TextModels import *
 
-from .models.TextModels import *
 
 import pygame
 import sys
