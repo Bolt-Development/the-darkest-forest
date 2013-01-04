@@ -61,7 +61,7 @@ class Scene(PubSub, ParentChild):
     def on_added_to_stage(self):
         self.emit('added_to_stage', stage = self.stage)
         for child in self.children:
-            chile.on_added_to_stage()
+            child.on_added_to_stage()
         self.on_stage = True
         
     def on_removed_from_stage(self):
