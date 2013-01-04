@@ -7,4 +7,4 @@ if __name__ == '__main__':
     from ResourceLoader import *
 
     loader = ResourceLoader()
-    loader.load_resource('bomb')
+    print loader.load_resource_by_name_and_type('bomb', 'audio')
