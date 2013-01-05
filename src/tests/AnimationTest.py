@@ -15,7 +15,7 @@ if __name__ == '__main__':
         animation_timer = AnimationController.init(engine)
         
         spritesheet_resource = ResourceLoader().load_resource_by_name_and_type('explosion', 'image')
-        animation_model = AnimationModel(spritesheet_resource, (0, 0), (282, 238), 10)
+        animation_model = AnimationModel(spritesheet_resource, (0, 0), (282, 238), 10, interval=70) # 70 makes it look cooler
         animation_controller = AnimationController(animation_model)
         animation_view = AnimationView(animation_model)
         

@@ -1,9 +1,10 @@
 from PubSub import *
 from ParentChild import *
+from models.Engine import *
 import pygame
 
 class Scene(PubSub, ParentChild):
-    def __init__(self, parent):
+    def __init__(self):
         PubSub.__init__(self)
         ParentChild.__init__(self)
         
@@ -16,6 +17,8 @@ class Scene(PubSub, ParentChild):
         
         self.initialized = False
         self.transitioning = False
+
+        self.engine = Engine()
         
     def init(self):    
         self.active = False

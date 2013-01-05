@@ -18,6 +18,7 @@ class AnimationController(object):
             emitter = AnimationController.animation_timer
         except:
             print 'Animation Controller -- No Instance of Timer Running in Class'
+            print 'Please run AnimationController.init()'
             emitter = None
             
         if emitter is not None:
