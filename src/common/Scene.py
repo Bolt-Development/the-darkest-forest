@@ -1,10 +1,11 @@
 from PubSub import *
 from ParentChild import *
 from models.Engine import *
+from Stage import *
 import pygame
 
 class Scene(PubSub, ParentChild):
-    def __init__(self):
+    def __init__(self, parent):
         PubSub.__init__(self)
         ParentChild.__init__(self)
         
@@ -76,7 +77,7 @@ class Scene(PubSub, ParentChild):
     def on_child_removed(self):
         self.emit('child_removed', child = child)
     
-    def on_parent_changed(self, parent):
+    def on_parent_changed(self, parent, old_parent):
         if isinstance(parent, Stage):
             self.stage = parent
         
