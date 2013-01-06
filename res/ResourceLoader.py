@@ -4,7 +4,7 @@ import fnmatch
 
 import pygame
 
-interesting_types = ['jpg', 'jpeg', 'gif', 'bmp', 'png', 'ogg', 'wav', 'ttf', 'mp3']
+interesting_types = ['jpg', 'jpeg', 'gif', 'bmp', 'png', 'ogg', 'wav', 'ttf', 'mp3', 'xml']
 def get_interesting_files(path):
     result = []
     for path, dirs, files in os.walk(path):
@@ -29,6 +29,10 @@ def get_type_by_ext(file):
     
     if fnmatch.fnmatch(file.lower(), r'*.mp3'):
         return types[4]
+
+    if fnmatch.fnmatch(file.lower(), r'*.xml'):
+        return types[3]
+
     
     return types[3]
 			
