@@ -8,3 +8,6 @@ if __name__ == '__main__':
 
     loader = ResourceLoader()
     print loader.load_resource_by_name_and_type('bomb', 'audio')
+
+    for cache in loader.cache:
+        print cache.name, cache.type

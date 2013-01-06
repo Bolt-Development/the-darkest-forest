@@ -19,9 +19,7 @@ def get_interesting_files(path):
                         #    <enemy name="test></enemy>
                         #</enemies>
                         types.append(XMLParser().get_type_element(file.strip(".xml")))
-                        result.append(os.path.join(path, file))
-                    else:
-                        result.append(os.path.join(path, file))
+                    result.append(os.path.join(path, file))
     return result
 
 types = ['image', 'audio', 'font', 'other', 'music']
