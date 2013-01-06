@@ -4,9 +4,9 @@ This will be our first project, in which we will be getting to know each other a
 
 The team is being lead by talented and professional individuals with many years of experience creating quality software solutions.
 
-## Website and Forums
+## Forums
 
-http://boltdevelopment.biz/
+http://boltdevelopment.boards.net
 
 
 ## BDT Roles:
