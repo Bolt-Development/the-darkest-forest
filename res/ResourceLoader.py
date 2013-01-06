@@ -4,14 +4,18 @@ import fnmatch
 
 import pygame
 
-interesting_types = ['jpg', 'jpeg', 'gif', 'bmp', 'png', 'ogg', 'wav', 'ttf', 'mp3']
+interesting_types = ['jpg', 'jpeg', 'gif', 'bmp', 'png', 'ogg', 'wav', 'ttf', 'mp3', 'xml']
 def get_interesting_files(path):
     result = []
     for path, dirs, files in os.walk(path):
         for file in files:
             for interesting_type in interesting_types:
                 if fnmatch.fnmatch(file.lower(), r'*.'+interesting_type):
-                    result.append(os.path.join(path, file))
+                    if fnmatch.fnmatch(file.lower(), r'*.'+"xml"):
+                        print "TODO: Parse XML and append root element to types"
+                        result.append(os.path.join(path, file))
+                    else:
+                        result.append(os.path.join(path, file))
     return result
 
 types = ['image', 'audio', 'font', 'other', 'music']
@@ -29,6 +33,10 @@ def get_type_by_ext(file):
     
     if fnmatch.fnmatch(file.lower(), r'*.mp3'):
         return types[4]
+
+    if fnmatch.fnmatch(file.lower(), r'*.xml'):
+        return types[3]
+
     
     return types[3]
 			
