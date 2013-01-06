@@ -5,14 +5,17 @@ class ParentChild(object):
         
         if parent is not None:
             self.parent.add_child(self)
-            
+    
     def add_child(self, *children):
         for child in children:
-            if child == self:
+            if child == self or child in self._children:
                 continue
             
             self._children.append(child)
-            child.parent = self
+            if child._parent is not None and child._parent != self:
+                child._parent.remove_child(child)
+                
+            child._parent = self
             self.on_child_added(child)
             
     def remove_child(self, *children):
@@ -22,7 +25,8 @@ class ParentChild(object):
             
             if child in self.children:
                 self._children.remove(child)
-                child.parent = None
+                if child._parent == self:
+                    child._parent = None
                 self.on_child_removed(child)
                 
     def clear_children(self):
@@ -37,21 +41,20 @@ class ParentChild(object):
         return self._parent
     def _set_parent(self, parent):
         old_parent = self._parent
-        if parent == self or parent in self._children:
+        if parent == self or parent == self._parent:
             return
         
-        if parent != self._parent and self._parent is not None:
-            self._parent.remove_child(self)
         self._parent = parent
-        if parent is not None and self not in parent.children:
-            self._parent.add_child(self)
-        self.on_parent_changed(parent, old_parent)
+        
+        if old_parent is not None:
+            old_parent.remove_child(self)
+        
     parent = property(_get_parent, _set_parent)
     
     def on_child_added(self, child):
         pass
     
-    def on_child_removed(self):
+    def on_child_removed(self, child):
         pass
     
     def on_parent_changed(self, parent, old_parent):
@@ -61,9 +64,10 @@ if __name__ == '__main__':
     node = ParentChild()
     node2 = ParentChild()
 
-    node3 = ParentChild()
-
-    node2.add_child(node3)
-    node2.parent = node
-
-    print node.children
+    node3 = ParentChild(node2)
+    node2.add_child(node)
+    node.add_child(node3)
+    
+    print node.children, len(node.children)
+    print node2.children, len(node2.children)
+    print node3.children, len(node3.children)
