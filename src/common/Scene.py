@@ -1,14 +1,20 @@
 from PubSub import *
 from ParentChild import *
-from models.Engine import *
+
+try:
+    from .models.Engine import *
+except:
+    from models.Engine import *
+    
 from Stage import *
 import pygame
 
 class Scene(PubSub, ParentChild):
-    def __init__(self, parent):
+    def __init__(self, name, parent=None):
         PubSub.__init__(self)
         ParentChild.__init__(self)
         
+        self.name = name
         self._width = self._height = self._x = self._y = 0
         
         self._surface = False
