@@ -11,7 +11,11 @@ def get_interesting_files(path):
         for file in files:
             for interesting_type in interesting_types:
                 if fnmatch.fnmatch(file.lower(), r'*.'+interesting_type):
-                    result.append(os.path.join(path, file))
+                    if fnmatch.fnmatch(file.lower(), r'*.'+"xml"):
+                        print "TODO: Parse XML and append root element to types"
+                        result.append(os.path.join(path, file))
+                    else:
+                        result.append(os.path.join(path, file))
     return result
 
 types = ['image', 'audio', 'font', 'other', 'music']
