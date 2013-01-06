@@ -1,10 +1,19 @@
-<enemies>
+<enemies typename="Enemy">
 
-    <enemy name="SuperScaryGuy">
+    <ScaryGuy>
 
         <hp>100</hp>
         <damage>50</damage>
 
-    </enemy>
+    </ScaryGuy>
+	
+	<SuperScaryGuy>
+
+        <hp>120</hp>
+        <damage>55</damage>
+		<loot>
+			<Item>Gold</Item>
+		</loot>
+    </SuperScaryGuy>
 
 </enemies>
