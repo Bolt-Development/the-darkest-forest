@@ -14,7 +14,6 @@ http://boltdevelopment.biz/
 * Project Manager: Nick Rogers
 * Lead Programmer: Joshua Byrom
 * Programmer: Joshua Rowe
-* Programmer: Geraint Spackman
 * Artist: Jordi Navarrete, Kindrick McAlister
 * Sound: Chris Kukla, Kindrick McAlister
 * Social Media & Web Design: Jason McArdle

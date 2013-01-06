@@ -18,8 +18,6 @@ class Scene(PubSub, ParentChild):
         
         self.initialized = False
         self.transitioning = False
-
-        self.engine = Engine()
         
     def init(self):    
         self.active = False
