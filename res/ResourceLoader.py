@@ -1,6 +1,7 @@
 import os
 import sys
 import fnmatch
+from XMLParser import *
 
 import pygame
 
@@ -12,7 +13,12 @@ def get_interesting_files(path):
             for interesting_type in interesting_types:
                 if fnmatch.fnmatch(file.lower(), r'*.'+interesting_type):
                     if fnmatch.fnmatch(file.lower(), r'*.'+"xml"):
-                        print "TODO: Parse XML and append root element to types"
+                        # appends the name of the elements inside the .xml onto types
+                        # Nota Bene:this will ignore the root element of an xml. in the example below it appends "enemy"
+                        #<enemies>
+                        #    <enemy name="test></enemy>
+                        #</enemies>
+                        types.append(XMLParser().get_type_element(file.strip(".xml")))
                         result.append(os.path.join(path, file))
                     else:
                         result.append(os.path.join(path, file))
@@ -35,7 +41,7 @@ def get_type_by_ext(file):
         return types[4]
 
     if fnmatch.fnmatch(file.lower(), r'*.xml'):
-        return types[3]
+        return XMLParser().get_type_element(file.strip(".xml"))
 
     
     return types[3]
