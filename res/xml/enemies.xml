@@ -1,0 +1,10 @@
+<Enemies>
+
+    <Enemy type_name="SuperScaryGuy">
+
+        <hp>100</hp>
+        <damage>50</damage>
+
+    </Enemy>
+
+</Enemies>
