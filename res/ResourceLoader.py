@@ -18,6 +18,7 @@ def get_interesting_files(path):
                         #<enemies>
                         #    <enemy name="test></enemy>
                         #</enemies>
+                        # This will probably be based on filename soon, unless other design decisions are provided
                         types.append(XMLParser().get_type_element(file.strip(".xml")))
                         result.append(os.path.join(path, file))
                     else:
