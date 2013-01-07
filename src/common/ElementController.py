@@ -61,7 +61,6 @@ class ElementController(object):
             self._model._hx = self._model._vx / magn
             self._model._hy = self._model._vy / magn
     
-    
     def _get_model(self):
         return model
     
