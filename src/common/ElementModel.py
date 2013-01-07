@@ -9,8 +9,14 @@ class ElementModel(PubSub, ParentChild):
         
         self._x = self._y = self._width = self._height = 0
         self._dx = self._dy = self._old_x, = self._old_y = 0
-        self._inner_width = self._inner_height = 0
-        self._vx = self._vy = self._ax = self._ay = 0
+        self._speed = self._max_force = self._max_speed = 100
+        self._force = self._friction_x = self._friction_y = 0
+        
+        # rotation target
+        self._rtx = self._rty = 0
+        
+        self._inner_width = self._inner_height = self._rotation = 0
+        self._vx = self._vy = self._ax = self._ay = self._hx = self._hy = 0
         self._size_dirty = self._move_dirty = False
         
         self._move_validator = None
