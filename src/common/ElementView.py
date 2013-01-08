@@ -35,8 +35,11 @@ class ElementView(PubSub, ParentChild):
         
         self.z_order = 0
         
-    def is_point_inside(self, x, y):
-        return x >= self.x and x <= self.x + self.width and y >= self.y and y <= self.y + self.height
+    def is_point_inside(self, x, y, use_global_position=False):
+        _x, _y = self._x, self._y
+        if use_global_position:
+            _x, _y = self.global_x, self.global_y
+        return x >= _x and x <= _x+ self.width and y >= _y and y <= _y + self.height
     
     def _get_x(self):
         return self._x
@@ -167,10 +170,17 @@ class ElementView(PubSub, ParentChild):
                 self.mouse_over = False
                 self.emit("mouse_exited")
                 
+    def on_mouse_clicked_in_parent(self, event, **kwargs):
+        down_x, down_y = kwargs['down_target']
+        up_x, up_y = kwargs['up_target']
+        
+        if self.is_point_inside(down_x, down_y, True) and self.is_point_inside(up_x, up_y, True):
+            self.emit('mouse_clicked', kwargs)
+                
     def on_render(self, event, **kwargs):
         surface = kwargs['surface']
         
         # render
         
-        self.emit('render', surface = self._surface)
+        self.emit('render', surface = self.surface)
     

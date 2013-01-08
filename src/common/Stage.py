@@ -9,6 +9,8 @@ class Stage(Engine, ParentChild):
         Engine.__init__(self, width, height)
         ParentChild.__init__(self)
         
+        self.last_mouse_down_target = None
+        
     def start(self, scene, start_paused = False):
         self.add_child(scene)
         Engine.start(self, start_paused)
@@ -31,7 +33,16 @@ class Stage(Engine, ParentChild):
         kwargs['stage'] = self
         PubSub.emit(self, message_type, **kwargs)
         
+        if message_type == 'mouse_down':
+            self.last_mouse_down_target = kwargs['position']
+        elif message_type == 'mouse_up':
+            self.emit('mouse_clicked', down_target=self.last_mouse_down_target, up_target=kwargs['position'])
+            self.last_mouse_down_target = None
+        
         for child in self.children:
             kwargs['scene'] = child
             child.emit(message_type, **kwargs)
+            
+    def point_over_element(self, elem, x, y):
+        return x >= elem.x and x <= elem.x + elem.width and y >= elem.y and y <= elem.y + elem.height
             
