@@ -19,7 +19,7 @@ class XMLLoader(object):
     def __init__(self):
         self.resource_path = os.path.dirname(os.path.realpath(__file__))
         self.xml_resources = []
-        self.types = []
+        self.types = ['loot', 'Item']
         for resource_path in get_files(self.resource_path):
             for element in XMLParser().extract(resource_path):
                 self.xml_resources.append(XMLResource(element, resource_path))

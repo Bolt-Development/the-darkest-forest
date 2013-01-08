@@ -25,18 +25,31 @@ class XMLParser(object):
         tree = ET.parse(file)
         root = tree.getroot()
 
-
-
         for element in root:
             if element.tag == name:
                 for child in element:
                     for type in types:
-                        if child.tag == type:
-                            print child.tag
+                        if child.tag == 'loot':
+                            loot_model = LootModel()
+                            for item in child:
+                                loot_model.add(item.text)
+                            setattr(model, child.tag, loot_model)
+                        elif child.tag == type:
+                            #setattr(model, child.tag, self.parse_child(child, types))
+                            pass
                         else:
                             setattr(model, child.tag, child.text)
 
         return model
+
+class LootModel(object):
+    def __init__(self, contents=None):
+        if contents is not None:
+            self.contents = contents
+        else:
+            self.contents = []
+    def add(self, item):
+        self.contents.append(item)
 
 if __name__ == '__main__':
     pass

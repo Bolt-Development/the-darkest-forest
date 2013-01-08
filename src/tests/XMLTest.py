@@ -14,4 +14,8 @@ if __name__ == '__main__':
 
     badguy_config = badguy_resource.load()
 
+    print badguy_config.hp
+    print badguy_config.damage
+    print badguy_config.loot
+
 
