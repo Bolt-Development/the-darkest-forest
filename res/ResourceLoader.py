@@ -12,8 +12,6 @@ def get_interesting_files(path):
         for file in files:
             for interesting_type in interesting_types:
                 if fnmatch.fnmatch(file.lower(), r'*.'+interesting_type):
-                    if fnmatch.fnmatch(file.lower(), r'*.'+"xml"):
-                        types.append(XMLParser().get_type_element(file.strip(".xml")))
                     result.append(os.path.join(path, file))
     return result
 
@@ -33,8 +31,6 @@ def get_type_by_ext(file):
     if fnmatch.fnmatch(file.lower(), r'*.mp3'):
         return types[4]
 
-    if fnmatch.fnmatch(file.lower(), r'*.xml'):
-        return XMLParser().get_type_element(file.strip(".xml"))
 
     
     return types[3]
