@@ -24,8 +24,17 @@ class XMLParser(object):
 
         tree = ET.parse(file)
         root = tree.getroot()
-        for child in root:
-            print child.tag, child.attrib
+
+
+
+        for element in root:
+            if element.tag == name:
+                for child in element:
+                    for type in types:
+                        if child.tag == type:
+                            print child.tag
+                        else:
+                            setattr(model, child.tag, child.text)
 
         return model
 
