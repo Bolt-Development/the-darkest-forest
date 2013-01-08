@@ -6,9 +6,10 @@ if __name__ == '__main__':
 
     from ResourceLoader import *
     from XMLParser import *
+    from XMLLoader import *
 
-    xml_resource = ResourceLoader().load_resource_by_name_and_type('enemies', 'enemy')
+    badguy_resource = XMLLoader().load_resource_by_name_and_type("Enemy", "SuperScaryBadGuy")
 
-    attributes = XMLParser().parse(xml_resource, "SuperScaryGuy")
-    print "hp:", attributes["hp"]
-    print "damage:", attributes["damage"]
+    #badguy_config = badguy_resource.load()
+
+

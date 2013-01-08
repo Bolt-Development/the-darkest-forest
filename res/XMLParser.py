@@ -2,9 +2,14 @@ import xml.etree.ElementTree as ET
 
 class XMLParser(object):
 
-    def get_type_element(self, root_element):
-        # Test
-        return "enemy"
+    def get_typename(self, file):
+        tree = ET.parse(file)
+        root = tree.getroot()
+        return root.attrib['typename']
+
+    def extract(self, file):
+        pass
+
     def parse(self, resource, name):
         """
         parse(filepath, type_name)
@@ -25,10 +30,4 @@ class XMLParser(object):
         return result_dict
 
 if __name__ == '__main__':
-    from ResourceLoader import *
-
-    xml_resource = ResourceLoader().load_resource_by_name_and_type('enemies', 'enemy')
-
-    attributes = XMLParser().parse(xml_resource, "SuperScaryGuy")
-    print "hp:", attributes["hp"]
-    print "damage:", attributes["damage"]
+    pass
