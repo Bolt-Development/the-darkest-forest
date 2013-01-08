@@ -8,7 +8,14 @@ class XMLParser(object):
         return root.attrib['typename']
 
     def extract(self, file):
-        pass
+        tree = ET.parse(file)
+        root = tree.getroot()
+
+        result = []
+        for child in root:
+            result.append(child.tag)
+
+        return result
 
     def parse(self, resource, name):
         """
