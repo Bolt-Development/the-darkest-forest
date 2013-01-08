@@ -42,15 +42,15 @@ class XMLLoader(object):
             print [res.name, res.type]
 
 class XMLResource(object):
-    def __init__(self, element, file):
+    def __init__(self, name, file):
         assert file.endswith(".xml"), "This ain't no XML bro"
 
-        self.element = element
-        self.name = element.tag
+        self.name = name
         self.filepath = file
         self.type = XMLParser().get_typename(self.filepath)
 
     def load(self):
-        return XMLModel()
+
+        return XMLParser().parse(self.name, self.filepath, XMLLoader().types)
 
 

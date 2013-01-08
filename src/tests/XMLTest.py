@@ -8,7 +8,7 @@ if __name__ == '__main__':
     from XMLParser import *
     from XMLLoader import *
 
-    XMLLoader().print_resources()
+    #XMLLoader().print_resources()
 
     badguy_resource = XMLLoader().load_resource_by_name_and_type("SuperScaryGuy", "Enemy")
 

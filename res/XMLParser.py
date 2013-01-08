@@ -1,4 +1,6 @@
 import xml.etree.ElementTree as ET
+from models.XMLModel import *
+
 
 class XMLParser(object):
 
@@ -13,10 +15,19 @@ class XMLParser(object):
 
         result = []
         for child in root:
-            element = ET.Element(tag=child.tag, attrib=child.attrib)
-            result.append(element)
+            result.append(child.tag)
 
         return result
+
+    def parse(self, name, file, types):
+        model = XMLModel()
+
+        tree = ET.parse(file)
+        root = tree.getroot()
+        for child in root:
+            print child.tag, child.attrib
+
+        return model
 
 if __name__ == '__main__':
     pass
