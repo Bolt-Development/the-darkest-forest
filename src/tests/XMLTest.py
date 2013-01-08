@@ -10,8 +10,8 @@ if __name__ == '__main__':
 
     XMLLoader().print_resources()
 
-    badguy_resource = XMLLoader().load_resource_by_name_and_type("Enemy", "SuperScaryBadGuy")
+    badguy_resource = XMLLoader().load_resource_by_name_and_type("SuperScaryGuy", "Enemy")
 
-    #badguy_config = badguy_resource.load()
+    badguy_config = badguy_resource.load()
 
 

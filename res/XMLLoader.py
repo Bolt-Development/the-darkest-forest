@@ -21,34 +21,36 @@ class XMLLoader(object):
         self.xml_resources = []
         self.types = []
         for resource_path in get_files(self.resource_path):
-            for name in XMLParser().extract(resource_path):
-                self.xml_resources.append(XMLResource(name, resource_path))
+            for element in XMLParser().extract(resource_path):
+                self.xml_resources.append(XMLResource(element, resource_path))
 
             type = XMLParser().get_typename(resource_path)
             if type not in self.types:
                 self.types.append(type)
 
-
+    def load_resources_by_name(self, name):
+        return [res for res in self.xml_resources if res.name == name]
 
     def load_resources_by_type(self, type):
-        print type
+        return [res for res in self.xml_resources if res.type == type]
 
     def load_resource_by_name_and_type(self, name, type):
-        print name, type
+        return [res for res in self.xml_resources if res.name == name and res.type == type][0]
 
     def print_resources(self):
         for res in self.xml_resources:
             print [res.name, res.type]
 
 class XMLResource(object):
-    def __init__(self, name, file):
+    def __init__(self, element, file):
         assert file.endswith(".xml"), "This ain't no XML bro"
 
-        self.name = name
+        self.element = element
+        self.name = element.tag
         self.filepath = file
         self.type = XMLParser().get_typename(self.filepath)
 
     def load(self):
-        pass
+        return XMLModel()
 
 
