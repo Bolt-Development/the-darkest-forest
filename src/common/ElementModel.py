@@ -35,14 +35,18 @@ class ElementModel(PubSub, ParentChild):
     def on_parent_changed(self, parent, old_parent):
         pass    # TODO check for instance of Stage, call on_added_to_stage for self and children
     
-    def _get_width(self):
-        if not self._size_dirty:
-            return self._width + self._inner_width
-        
+    def _get_inner_size(self):
         self._inner_width = 0
+        self._inner_height = 0
         for child in self.children:
             self._inner_width += child.width
-        return self._width + self._inner_width
+            self._inner_height += child.height
+        self._size_dirty = False
+    
+    def _get_width(self):
+        if self._size_dirty:
+            self._get_inner_size()
+        return max(self._width, self._inner_width)
     
     def _set_width(self, value):
         self._width = value
@@ -51,12 +55,8 @@ class ElementModel(PubSub, ParentChild):
         
     def _get_height(self):
         if not self._size_dirty:
-            return self._height + self._inner_height
-        
-        self._inner_height = 0
-        for child in self.children:
-            self._inner_height += child.height
-        return self._height + self._inner_height
+            self._get_inner_size()
+        return max(self._height, self._inner_height)
     
     def _set_height(self, value):
         self._height = value
