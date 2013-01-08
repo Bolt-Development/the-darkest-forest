@@ -20,7 +20,10 @@ class XMLLoader(object):
         self.resource_path = os.path.dirname(os.path.realpath(__file__))
         self.xml_resources = []
         for resource_path in get_files(self.resource_path):
-            self.xml_resources.append(XMLParser().extract(resource_path))
+            for name in XMLParser().extract(resource_path):
+                self.xml_resources.append(XMLResource(name, resource_path))
+
+
 
     def load_resources_by_type(self, type):
         print type
@@ -28,15 +31,19 @@ class XMLLoader(object):
     def load_resource_by_name_and_type(self, name, type):
         print name, type
 
+    def print_resources(self):
+        for res in self.xml_resources:
+            print [res.name, res.type]
+
 class XMLResource(object):
-    def __init__(self, file):
-        assert file.endswith(".xml"), "This ain't no XML buddy"
+    def __init__(self, name, file):
+        assert file.endswith(".xml"), "This ain't no XML bro"
 
+        self.name = name
         self.filepath = file
-
         self.type = XMLParser().get_typename(self.filepath)
 
     def load(self):
-        return XMLModel()
+        pass
 
 
