@@ -8,6 +8,7 @@ except:
 import string
 import pygame
 import sys
+import re
 
 class BaseTextView(ElementView):
     def __init__(self, model):
@@ -97,7 +98,7 @@ class ParagraphView(ElementView):
         
         self.clear_children()
         
-        txt = self._model.text.replace('\n', ' \n ').split(' ')
+        txt = re.sub('\n', ' \n ', self._model.text).split(' ')
         for word in txt:
             if word == '\n':
                 view = TextView(TextModel(self._model.resource, '\n', self._model.size))
@@ -164,7 +165,10 @@ class ParagraphView(ElementView):
             if newline:
                 max_height = 0
             
-            x += child.width + self._offset_x
+            if child.text != '\n':
+                x += child.width + self._offset_x
+            else:
+                x + self._offset_x
         self._height = y + max_height + self._offset_y * 2
     
     
@@ -185,7 +189,7 @@ class ParagraphView(ElementView):
             self._surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
             self.model_dirty = False
             
-            self._surface.fill((0, 0, 255, 45), (0, 0, self.width, self.height))
+        self._surface.fill((0, 0, 255, 45), (0, 0, self.width, self.height))
         
     def render(self, surface):
         blitter = pygame.Surface.blit
