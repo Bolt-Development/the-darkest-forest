@@ -88,7 +88,7 @@ class ParagraphView(ElementView):
         
         self.ignore_in_phrases = []
     
-    ignore = '~`!@#$%^&*()_+=-{[}]\|'";:/?.>,<\n"
+    ignore = '~`!@#$%^&*()_+=-{[}]\|'";:/?.>,<"
     
     def init_words(self):
         if self._model.text == self.last_text:
