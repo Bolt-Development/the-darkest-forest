@@ -189,8 +189,6 @@ class ParagraphView(ElementView):
             self._surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
             self.model_dirty = False
             
-        self._surface.fill((0, 0, 255, 45), (0, 0, self.width, self.height))
-        
     def render(self, surface):
         blitter = pygame.Surface.blit
         blitter(surface, self._surface, (self.x, self.y, self.width, self.height))

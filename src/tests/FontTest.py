@@ -40,13 +40,12 @@ if __name__ == '__main__':
     def on_click(event, **kwargs):
         view = kwargs['emitter']
         print 'you clicked', view.text
-        
 
     def on_word_added(event, **kwargs):
         view = kwargs['view']
         view.on('mouse_enter', on_enter)
         view.on('mouse_exit', on_exit)
-        view.on('clicked', on_click)
+        view.on('mouse_clicked', on_click)
 
     def on_init(event, **kwargs):
         engine = kwargs['emitter']
@@ -58,7 +57,10 @@ if __name__ == '__main__':
         model = TextModel(font, text=long_string, size=24)
         view = ParagraphView(model)
         view.on('word_added', on_word_added)
+
         
+        view.show_background = True
+        view.show_border = True
         view.x = 30
         view.y = 13
 

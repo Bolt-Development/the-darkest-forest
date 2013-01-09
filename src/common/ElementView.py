@@ -202,8 +202,19 @@ class ElementView(PubSub, ParentChild):
                 
     def on_render(self, event, **kwargs):
         surface = kwargs['surface']
-        
+                
         self.pre_render(surface)
+        if self._surface is not None:
+            if self.show_border:
+                self._surface.fill(self.border_color, (0, 0, self.width, self.height))
+                
+            if self.show_background:
+                self._surface.fill(self.background_color, (self.border_size, 
+                                                           self.border_size, 
+                                                           self.width - self.border_size * 2, 
+                                                           self.height - self.border_size * 2))
+        
+        
         self.emit('render', surface = self._surface)
         self.render(surface)
         
