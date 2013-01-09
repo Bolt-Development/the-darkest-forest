@@ -37,6 +37,7 @@ class ElementView(PubSub, ParentChild):
         self.mouse_down_on = False
         self._last_known_mouse = None
         
+        self.visible = True
         self.z_order = 0
         
     def is_point_inside(self, x, y, use_global_position=False):
@@ -216,7 +217,8 @@ class ElementView(PubSub, ParentChild):
         
         
         self.emit('render', surface = self._surface)
-        self.render(surface)
+        if self.visible:
+            self.render(surface)
         
     def render(self, surface):
         pass
