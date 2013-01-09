@@ -97,78 +97,76 @@ class ParagraphView(ElementView):
         
         self.clear_children()
         
-        max_height = 0
-        
-        x, y = self._offset_x * 2, self._offset_y
-        for line in self._model.text.split('\n'):
-            for word in line.split(' '):
-                if len(word.strip()) == 0:
-                    continue
-                
-                clean_word =  word.translate(string.maketrans('', ''), string.punctuation)
-                
-                # strip punctuation before the word
-                for character in word:
-                    if character == clean_word[0]:
-                        break
-                    elif character in ParagraphView.ignore:
-                        view = TextView(TextModel(self._model.resource, character, self._model.size))
-                        self.add_child(view)
-                        
-                        view.x = x
-                        view.y = y
-                        
-                        x = x + view.width
-                    
-                view = TextView(TextModel(self._model.resource, clean_word, self._model.size))
+        txt = self._model.text.replace('\n', ' \n ').split(' ')
+        for word in txt:
+            if word == '\n':
+                view = TextView(TextModel(self._model.resource, '\n', self._model.size))
                 self.add_child(view)
+                continue
+            elif len(word.strip()) == 0:
+                continue
                 
-                max_height = max(max_height, view.height)
+            clean_word = word.translate(string.maketrans('', ''), string.punctuation)
                 
-                if x + view.width > self._width - (self._offset_x * 2):
-                    x = self._offset_x * 2
-                    y += max(max_height, view.height)
+            # strip punctuation before the word
+            for character in word:
+                if character == clean_word[0]:
+                    break
+                elif character in ParagraphView.ignore:
+                    view = TextView(TextModel(self._model.resource, character, self._model.size))
+                    view.justify = 'left'
+                    self.add_child(view)
+                    
+            view = TextView(TextModel(self._model.resource, clean_word, self._model.size))
+            self.add_child(view)
                 
-                view.x = x
-                view.y = y
-                
-                x += view.width + self._offset_x
-                
-                # strip punctuation after word
-                for character in word[::-1]:
-                    if character == clean_word[-1]:
-                        break
-                    elif character in ParagraphView.ignore:
-                        view = TextView(TextModel(self._model.resource, character, self._model.size))
-                        self.add_child(view)
-                        
-                        view.x = x - self._offset_x
-                        view.y = y
-                        
-                        x = x + view.width + self._offset_x
-                
-            y += max_height
-            x = self._offset_x * 2
+            # strip punctuation after word
+            for character in word[::-1]:
+                if character == clean_word[-1]:
+                    break
+                elif character in ParagraphView.ignore:
+                    view = TextView(TextModel(self._model.resource, character, self._model.size))
+                    view.justify = 'right'
+                    self.add_child(view)
         
-        self._height = y
+        self.handle_resize()
         self.last_text = self._model.text
         
     def handle_resize(self):
         max_height = 0
-        x, y = self._offset_x, self._offset_y
+        x, y = self._offset_x * 2, self._offset_y
+        
+        newline = False
         for child in self.children:
+            newline = False
             max_height = max(max_height, child.height)
-                
-            if x + child.width > self._width - (self._offset_x * 2):
-                x = self._offset_x
+            
+            if child.text == '\n' or x + child.width > self._width - (self._offset_x * 2):
+                x = self._offset_x * 2
                 y += max(max_height, child.height)
+                newline = True
                 
-            child.x = x
-            child.y = y
+            try:
+                justify = child.justify
+                if justify == 'left':
+                    child.x = x + self._offset_x
+                    child.y = y
+                elif justify == 'right':
+                    child.x = x - self._offset_x
+                    child.y = y
+                    
+                    if newline:
+                        child.y -= max(max_height, child_height)
+            except:
+                child.x = x
+                child.y = y
                 
+            if newline:
+                max_height = 0
+            
             x += child.width + self._offset_x
-        y += max_height
-        x = self._offset_x
+        self._height = y + max_height + self._offset_y * 2
+    
     
     def on_model_changed(self, event, **kwargs):
         self.model_dirty = True
