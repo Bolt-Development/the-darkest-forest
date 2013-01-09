@@ -86,13 +86,11 @@ if __name__ == '__main__':
             engine.on('render', instruction_view.on_render)
 
         engine.on('render', view.on_render)
-        engine.on('mouse_motion', view.on_mouse_motion)
+        engine.on('mouse_motion', view.on_mouse_moved_in_parent)
         engine.on('left_down', on_left)
         engine.on('right_down', on_right)
         engine.on('up_down', on_up)
         engine.on('down_down', on_down)
-        engine.on('mouse_down', view.on_mouse_down)
-        engine.on('mouse_up', view.on_mouse_up)
 
     
     engine = Engine()

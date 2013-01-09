@@ -23,6 +23,7 @@ class TextModel(PubSub):
             self.set_text(self._text)
         except:
             self.set_text('')
+        self.emit('change')
     def get_font(self):
         return self._font
     font = property(get_font)

@@ -84,4 +84,5 @@ class Scene(PubSub, ParentChild):
     def on_parent_changed(self, parent, old_parent):
         if isinstance(parent, Stage):
             self.stage = parent
+            self.emit('added_to_stage')
         

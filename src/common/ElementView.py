@@ -1,4 +1,5 @@
 from PubSub import *
+from ParentChild import *
 import pygame
 
 class ElementView(PubSub, ParentChild):
@@ -13,6 +14,8 @@ class ElementView(PubSub, ParentChild):
         self._x = self._y = 0
         self._gx = self._gy = 0
         self._scale_x = self._scale_y = 1.0
+        self._rotation = 0
+        
         self._scale_dirty = False
         
         self._width = model.width 
@@ -32,6 +35,7 @@ class ElementView(PubSub, ParentChild):
         
         self.mouse_over = False
         self.mouse_down_on = False
+        self._last_known_mouse = None
         
         self.z_order = 0
         
@@ -59,8 +63,8 @@ class ElementView(PubSub, ParentChild):
     y = property(_get_y, _set_y)
     
     def _calculate_size(self):
-        self._width = self.model.width * self._scale_x
-        self._height = self.model.height * self._scale_y
+        self._width = self._model.width * self._scale_x
+        self._height = self._model.height * self._scale_y
         self._surface = pygame.Surface((self._width, self._height), pygame.SRCALPHA)
     
     def _get_scale_x(self):
@@ -110,31 +114,38 @@ class ElementView(PubSub, ParentChild):
     global_y = property(_get_global_y)
                              
     def _get_inner_size(self):
-        self._inner_width = 0
-        self._inner_height = 0
+        max_width = 0
+        max_height = 0
+        
         for child in self.children:
-            self._inner_width += child.width
-            self._inner_height += child.height
+            max_width = max(child.width, max_width)
+            max_height = max(child.height, max_height)
+            
+            
+        self._inner_width = max_width
+        self._inner_height = max_height
+        
         self._size_dirty = False
     
     def _get_width(self):
         if self._size_dirty:
             self._get_inner_size()
-        return max(self._width, self._inner_width)
+        return max(self._width, self._inner_width) # * scale?
     
     def _set_width(self, value):
         self._width = value
+        self._size_dirty = True
         
-    width = property(_get_Width, _set_width)
+    width = property(_get_width, _set_width)
         
     def _get_height(self):
-        if not self._size_dirty:
+        if self._size_dirty:
             self._get_inner_size()
         return max(self._height, self._inner_height)
     
     def _set_height(self, value):
         self._height = value
-        
+        self._size_dirty = True
     height = property(_get_height, _set_height)
     
     def on_child_added(self, child):
@@ -150,18 +161,27 @@ class ElementView(PubSub, ParentChild):
             old_parent.remove('render', self.on_render)
             old_parent.remove('moved', self.on_parent_moved)
             old_parent.remove('mouse_motion', self.on_mouse_moved_in_parent)
-        parent.on('render', self.on_render)
-        parent.on('moved', self.on_parent_moved)
-        parent.on('mouse_motion', self.on_mouse_moved_in_parent)
+            
+        if parent is not None:
+            parent.on('render', self.on_render)
+            parent.on('moved', self.on_parent_moved)
+            parent.on('mouse_motion', self.on_mouse_moved_in_parent)
+            parent.on('mouse_clicked', self.on_mouse_clicked_in_parent)
         
     def on_parent_moved(self, event, **kwargs):
         self._global_dirty = True
             
     def on_mouse_moved_in_parent(self, event, **kwargs):
         x, y = kwargs['position']
-        if self.is_point_inside(x, y):
+        
+        _x, _y = x, y   # remove this later (used during testing)
+        if self.parent is not None:
+            _x = x - self.parent.x
+            _y = y - self.parent.y
+            
+        if self.is_point_inside(_x, _y):
             if self.mouse_over:
-                self.emit('mouse_motion')
+                self.emit('mouse_motion', **kwargs)
             else:
                 self.mouse_over = True
                 self.emit('mouse_entered')
@@ -169,10 +189,13 @@ class ElementView(PubSub, ParentChild):
             if self.mouse_over:
                 self.mouse_over = False
                 self.emit("mouse_exited")
+        self._last_known_mouse = (x, y)
                 
     def on_mouse_clicked_in_parent(self, event, **kwargs):
         down_x, down_y = kwargs['down_target']
         up_x, up_y = kwargs['up_target']
+        
+        print down_x, down_y, up_x, up_y
         
         if self.is_point_inside(down_x, down_y, True) and self.is_point_inside(up_x, up_y, True):
             self.emit('mouse_clicked', kwargs)
@@ -180,7 +203,13 @@ class ElementView(PubSub, ParentChild):
     def on_render(self, event, **kwargs):
         surface = kwargs['surface']
         
-        # render
+        self.pre_render(surface)
+        self.emit('render', surface = self._surface)
+        self.render(surface)
         
-        self.emit('render', surface = self.surface)
+    def render(self, surface):
+        pass
+    
+    def pre_render(self, surface):
+        pass
     

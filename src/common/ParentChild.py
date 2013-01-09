@@ -15,7 +15,7 @@ class ParentChild(object):
             if child._parent is not None and child._parent != self:
                 child._parent.remove_child(child)
                 
-            child._parent = self
+            child.parent = self
             self.on_child_added(child)
             
     def remove_child(self, *children):
@@ -26,7 +26,7 @@ class ParentChild(object):
             if child in self.children:
                 self._children.remove(child)
                 if child._parent == self:
-                    child._parent = None
+                    child.parent = None
                 self.on_child_removed(child)
                 
     def clear_children(self):
@@ -48,6 +48,8 @@ class ParentChild(object):
         
         if old_parent is not None:
             old_parent.remove_child(self)
+            
+        self.on_parent_changed(parent, old_parent)
         
     parent = property(_get_parent, _set_parent)
     

@@ -38,6 +38,8 @@ class Stage(Engine, ParentChild):
         elif message_type == 'mouse_up':
             self.emit('mouse_clicked', down_target=self.last_mouse_down_target, up_target=kwargs['position'])
             self.last_mouse_down_target = None
+        elif message_type == 'mouse_motion':
+            self.emit('mouse_drag', down_target = self.last_mouse_down_target, drag_position = kwargs['position'])
         
         for child in self.children:
             kwargs['scene'] = child
