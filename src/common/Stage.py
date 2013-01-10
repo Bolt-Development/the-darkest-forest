@@ -31,15 +31,16 @@ class Stage(Engine, ParentChild):
         """
         
         kwargs['stage'] = self
-        PubSub.emit(self, message_type, **kwargs)
         
         if message_type == 'mouse_down':
             self.last_mouse_down_target = kwargs['position']
         elif message_type == 'mouse_up':
             self.emit('mouse_clicked', down_target=self.last_mouse_down_target, up_target=kwargs['position'])
             self.last_mouse_down_target = None
+            return
         elif message_type == 'mouse_motion':
-            self.emit('mouse_drag', down_target = self.last_mouse_down_target, drag_position = kwargs['position'])
+            # TODO :: mouse dragging
+            pass 
         
         for child in self.children:
             kwargs['scene'] = child

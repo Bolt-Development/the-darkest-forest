@@ -1,5 +1,8 @@
 from PubSub import *
 from ParentChild import *
+
+from Stage import * # for isinstance
+
 import pygame
 
 class ElementView(PubSub, ParentChild):
@@ -43,6 +46,11 @@ class ElementView(PubSub, ParentChild):
         
         self.visible = True
         self.z_order = 0
+        
+        
+        self._stage = False
+        self.on_stage = False
+        
         
     def is_point_inside(self, x, y, use_global_position=False):
         _x, _y = self._x, self._y
@@ -125,8 +133,8 @@ class ElementView(PubSub, ParentChild):
         max_height = 0
         
         for child in self.children:
-            max_width = max(child.width, max_width)
-            max_height = max(child.height, max_height)
+            max_width = max(child.x + child.width, max_width)
+            max_height = max(child.y + child.height, max_height)
             
             
         self._inner_width = max_width
@@ -162,6 +170,7 @@ class ElementView(PubSub, ParentChild):
     def on_child_added(self, child):
         self._size_dirty = True
         child.on('change', self.make_dirty)
+        # TODO :: consider listening for moved events
         self.emit('child_added', child = child)
     
     def on_child_removed(self, child):
@@ -174,12 +183,36 @@ class ElementView(PubSub, ParentChild):
             old_parent.remove('render', self.on_render)
             old_parent.remove('moved', self.on_parent_moved)
             old_parent.remove('mouse_motion', self.on_mouse_moved_in_parent)
+            old_parent.remove('mouse_clicked', self.on_mouse_clicked_in_parent)
+            old_parent.remove('added_to_stage', self.on_added_to_stage)
+            old_parent.remove('removed_from_stage', self.on_removed_from_stage)
+            
+            if self.on_stage:
+                self.on_removed_from_stage()
+                self.on_stage = False
             
         if parent is not None:
             parent.on('render', self.on_render)
             parent.on('moved', self.on_parent_moved)
             parent.on('mouse_motion', self.on_mouse_moved_in_parent)
             parent.on('mouse_clicked', self.on_mouse_clicked_in_parent)
+            parent.on('added_to_stage', self.on_added_to_stage)
+            parent.on('removed_from_stage', self.on_removed_from_stage)
+            
+            up = parent
+            while up is not None:
+                if isinstance(up, Stage):
+                    if not self.on_stage:
+                        self._stage = up
+                        self.on_added_to_stage()
+                        self.on_stage = True
+                up = up.parent
+                
+    def on_added_to_stage(self):
+        self.emit('added_to_stage')
+        
+    def on_removed_from_stage(self):
+        self.emit('removed_from_stage')
         
     def on_parent_moved(self, event, **kwargs):
         self._global_dirty = True
@@ -209,8 +242,9 @@ class ElementView(PubSub, ParentChild):
         up_x, up_y = kwargs['up_target']
         
         if self.is_point_inside(down_x, down_y, True) and self.is_point_inside(up_x, up_y, True):
-            self.emit('mouse_clicked', **kwargs)
-                
+            kwargs['target'] = self
+            self.propagate(event, **kwargs)
+            
     def on_render(self, event, **kwargs):
         surface = kwargs['surface']
                 

@@ -6,6 +6,7 @@ if __name__ == '__main__':
 
     from common.Scene import *
     from common.Stage import *
+    from common.Transitions import *
 
     
     from common.gui.Buttons import *
@@ -21,25 +22,52 @@ if __name__ == '__main__':
         print event
 
     def on_init(event, **kwargs):
-        def set_text(txt):
-            def closure():
-                print 'here'
-                button.text = txt
-            return closure
+        def on_click(event, **kwargs):
+            button.text = 'oops, !'
+
+            button.x = stage.width * 0.5 - button.width * 0.5
+            button.y = stage.height * 0.5 - button.height * 0.5
+
+            if next_scene.parent == menu1:
+                print 'removing'
+                menu1.remove_child(next_scene)
+            else:
+                print 'adding'
+                next_scene.parent = menu1
+
+        def on_scene_next(event, **kwargs):
+            ScrollTransition(menu1, menu2).start(stage)
+            
+        text = 'Click me'
+        count = 0
+    
         button = Button(TextModel(font, "Click Me", 24))
-        button.on('mouse_clicked', set_text('you clicked me'))
+        button.on('mouse_clicked', on_click)
+
+        next_scene = Button(TextModel(font, 'Next Scene', 24))
+        next_scene.on('mouse_clicked', on_scene_next)
 
         button.x = stage.width * 0.5 - button.width * 0.5
         button.y = stage.height * 0.5 - button.height * 0.5
+
+        next_scene.x = stage.width * 0.5 - button.width * 0.5
+        next_scene.y = button.y + button.height + 10
         
         menu1.add_child(button)
+        menu1.add_child(next_scene)
+
+    def on_init2(event, **kwargs):
+        button2 = Button(TextModel(font, "Go Back To Main Menu", 24))
+        menu2.add_child(button2)
 
     def on_render(event, **kwargs):
         print event, kwargs
 
     menu1 = Scene("Menu One")
     menu1.on('init', on_init)
-   # menu1.on('render', on_render)
+
+    menu2 = Scene("Menu Two")
+    menu2.on('init', on_init2)
     
     stage = Stage()
     stage.start(menu1)

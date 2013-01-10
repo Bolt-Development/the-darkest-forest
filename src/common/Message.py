@@ -1,11 +1,11 @@
-import time
+import pygame
 
 class Message(object):
     def __init__(self, message_type, message='', reason=None):
         self.message_type = message_type
         self.message = message
 
-        self.timestamp = time.time()
+        self.timestamp = pygame.time.get_ticks()
         self.reason = reason
 
     def __repr__(self):
@@ -15,7 +15,6 @@ class Message(object):
                          str(self.timestamp),
                          self.reason or 'no_reason',
                         ']'])
-
 
 if __name__ == '__main__':
     print Message('update')

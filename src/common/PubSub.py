@@ -20,13 +20,19 @@ class PubSub(object):
             
         # only remembers last arguments
         self.memory[message_type]=kwargs
+        
+    def propagate(self, event, **kwargs):
+        self.__emit_event_to_handlers(event, **kwargs)
+        self.memory[event.message_type]=kwargs
             
     def __emit_to_handlers(self, message_type, **kwargs):
-            handlers = self.handlers[message_type]
-            to_remove = []
-
             event = self._parse_msg_from_kwargs(message_type, **kwargs)
+            self.__emit_event_to_handlers(event, **kwargs)
 
+    def __emit_event_to_handlers(self, event, **kwargs):
+            handlers = self.handlers[event.message_type]
+            to_remove = []
+            
             for handler in handlers:
                 handler.handle(event, **kwargs)
                 condition = self._handle_condition(handler, event, **kwargs)
