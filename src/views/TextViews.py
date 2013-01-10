@@ -40,6 +40,7 @@ class BaseTextView(ElementView):
     def on_render(self, event, **kwargs):
         if self.dirty: 
             self.init_surface()
+            self.emit('change')
         
         ElementView.on_render(self, event, **kwargs)
             

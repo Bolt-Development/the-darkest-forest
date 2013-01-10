@@ -21,8 +21,13 @@ if __name__ == '__main__':
         print event
 
     def on_init(event, **kwargs):
+        def set_text(txt):
+            def closure():
+                print 'here'
+                button.text = txt
+            return closure
         button = Button(TextModel(font, "Click Me", 24))
-        button.on('mouse_clicked', print_event)
+        button.on('mouse_clicked', set_text('you clicked me'))
 
         button.x = stage.width * 0.5 - button.width * 0.5
         button.y = stage.height * 0.5 - button.height * 0.5

@@ -155,12 +155,18 @@ class ElementView(PubSub, ParentChild):
         self._size_dirty = True
     height = property(_get_height, _set_height)
     
+    def make_dirty(self):
+        self._size_dirty = True
+        self._scale_dirty = True
+    
     def on_child_added(self, child):
         self._size_dirty = True
+        child.on('change', self.make_dirty)
         self.emit('child_added', child = child)
     
     def on_child_removed(self, child):
         self._size_dirty = True
+        child.remove('change', self.make_dirty)
         self.emit('child_removed', child = child)
     
     def on_parent_changed(self, parent, old_parent):
@@ -213,6 +219,7 @@ class ElementView(PubSub, ParentChild):
             if self._surface.get_width() != self.width or self._surface.get_height() != self.height:
                 # consider a copy of the old (too small) surface
                 self._surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+                self.emit('change')
             
             if self.show_border:
                 self._surface.fill(self.border_color, (0, 0, self.width, self.height))
