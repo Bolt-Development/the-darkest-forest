@@ -28,12 +28,14 @@ if __name__ == '__main__':
             button.x = stage.width * 0.5 - button.width * 0.5
             button.y = stage.height * 0.5 - button.height * 0.5
 
+            print 'before', next_scene.parent
             if next_scene.parent == menu1:
                 print 'removing'
                 menu1.remove_child(next_scene)
             else:
                 print 'adding'
                 next_scene.parent = menu1
+            print 'after', next_scene.parent
 
         def on_scene_next(event, **kwargs):
             ScrollTransition(menu1, menu2).start(stage)

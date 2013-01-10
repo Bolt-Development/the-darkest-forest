@@ -30,6 +30,7 @@ class PubSub(object):
             self.__emit_event_to_handlers(event, **kwargs)
 
     def __emit_event_to_handlers(self, event, **kwargs):
+        if event.message_type in self.handlers:
             handlers = self.handlers[event.message_type]
             to_remove = []
             

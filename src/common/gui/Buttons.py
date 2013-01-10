@@ -17,9 +17,7 @@ class Button(ElementView):
         self._text_view.x = self._offset_x
         self._text_view.y = self._offset_y
         
-        #self.add_child(self._text_view)
-        
-        self._width = self._height = 200
+        self.add_child(self._text_view)
         
         self.show_background = True
         self.show_border = True
