@@ -47,4 +47,15 @@ class Stage(Engine, ParentChild):
             
     def point_over_element(self, elem, x, y):
         return x >= elem.x and x <= elem.x + elem.width and y >= elem.y and y <= elem.y + elem.height
+    
+    
+    # x and y are not settable
+    def _get_x(self):
+        return 0
+    
+    def _get_y(self):
+        return 0
+    
+    x = property(_get_x)
+    y = property(_get_y)
             

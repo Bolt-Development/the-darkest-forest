@@ -58,10 +58,12 @@ class ElementView(PubSub, ParentChild):
     
     def _set_x(self, value):
         self._x = value
+        self._global_dirty = True
         self.emit('moved')
         
     def _set_y(self, value):
         self._y = value
+        self._global_dirty = True
         self.emit('moved')
         
     x = property(_get_x, _set_x)
@@ -103,6 +105,7 @@ class ElementView(PubSub, ParentChild):
         while parent is not None:
             self._gx += parent.x
             self._gy += parent.y
+            parent = parent.parent
         self._global_dirty = False
         
     def _get_global_x(self):
@@ -198,8 +201,6 @@ class ElementView(PubSub, ParentChild):
     def on_mouse_clicked_in_parent(self, event, **kwargs):
         down_x, down_y = kwargs['down_target']
         up_x, up_y = kwargs['up_target']
-        
-        print down_x, down_y, up_x, up_y
         
         if self.is_point_inside(down_x, down_y, True) and self.is_point_inside(up_x, up_y, True):
             self.emit('mouse_clicked', **kwargs)

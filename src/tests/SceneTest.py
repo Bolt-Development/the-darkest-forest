@@ -21,7 +21,13 @@ if __name__ == '__main__':
         print event
 
     def on_init(event, **kwargs):
-        menu1.add_child(Button(TextModel(font, "Click Me", 24)))
+        button = Button(TextModel(font, "Click Me", 24))
+        button.on('mouse_clicked', print_event)
+
+        button.x = stage.width * 0.5 - button.width * 0.5
+        button.y = stage.height * 0.5 - button.height * 0.5
+        
+        menu1.add_child(button)
 
     def on_render(event, **kwargs):
         print event, kwargs
