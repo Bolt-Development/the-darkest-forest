@@ -41,11 +41,13 @@ class Scene(PubSub, ParentChild):
         if not self.initialized:
             self.init()
         self.last = last
+        self.last_time_entered = pygame.time.get_ticks()
         self.emit('entered', last = last)
         
     def exit(self, next):
         self.next = next
-        self.emit('exited', next = next)
+        self.last_time_exited = pygame.time.get_ticks()
+        self.emit('exited', next = next, time_in_scene = self.last_time_exited - self.last_time_entered)
         
     def _get_surface(self):
         if self._surface:
