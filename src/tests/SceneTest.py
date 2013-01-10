@@ -7,14 +7,28 @@ if __name__ == '__main__':
     from common.Scene import *
     from common.Stage import *
 
-    def on_menu_one_tick():
-        print 'menu one tick'
+    
+    from common.gui.Buttons import *
+    from models.TextModels import *
+    from ResourceLoader import *
+    
+    fonts = ResourceLoader().load_resources_by_type('font')
+
+    import random
+    font = fonts[random.randint(0, len(fonts) - 1)]
 
     def print_event(event, **kwargs):
         print event
 
+    def on_init(event, **kwargs):
+        menu1.add_child(Button(TextModel(font, "Click Me", 24)))
+
+    def on_render(event, **kwargs):
+        print event, kwargs
+
     menu1 = Scene("Menu One")
-    menu1.on('tick', on_menu_one_tick)
+    menu1.on('init', on_init)
+   # menu1.on('render', on_render)
     
     stage = Stage()
     stage.start(menu1)

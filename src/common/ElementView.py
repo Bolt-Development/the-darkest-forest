@@ -4,7 +4,7 @@ import pygame
 
 class ElementView(PubSub, ParentChild):
     """ Handles common tasks such as mouse on, over, out in. """
-    def __init__(self, model, controller = None):
+    def __init__(self, model = None, controller = None):
         PubSub.__init__(self)
         ParentChild.__init__(self)
         
@@ -18,8 +18,12 @@ class ElementView(PubSub, ParentChild):
         
         self._scale_dirty = False
         
-        self._width = model.width 
-        self._height = model.height
+        if model is not None:
+            self._width = model.width 
+            self._height = model.height
+        else:
+            self._width = self._height = 0
+            
         self._surface = pygame.Surface((self._width, self._height), pygame.SRCALPHA)
         self._inner_width = self._inner_height = 0
         
@@ -66,7 +70,6 @@ class ElementView(PubSub, ParentChild):
     def _calculate_size(self):
         self._width = self._model.width * self._scale_x
         self._height = self._model.height * self._scale_y
-        self._surface = pygame.Surface((self._width, self._height), pygame.SRCALPHA)
     
     def _get_scale_x(self):
         if self._scale_dirty:
@@ -199,13 +202,17 @@ class ElementView(PubSub, ParentChild):
         print down_x, down_y, up_x, up_y
         
         if self.is_point_inside(down_x, down_y, True) and self.is_point_inside(up_x, up_y, True):
-            self.emit('mouse_clicked', kwargs)
+            self.emit('mouse_clicked', **kwargs)
                 
     def on_render(self, event, **kwargs):
         surface = kwargs['surface']
                 
         self.pre_render(surface)
         if self._surface is not None:
+            if self._surface.get_width() != self.width or self._surface.get_height() != self.height:
+                # consider a copy of the old (too small) surface
+                self._surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+            
             if self.show_border:
                 self._surface.fill(self.border_color, (0, 0, self.width, self.height))
                 
@@ -214,14 +221,14 @@ class ElementView(PubSub, ParentChild):
                                                            self.border_size, 
                                                            self.width - self.border_size * 2, 
                                                            self.height - self.border_size * 2))
-        
-        
+                
         self.emit('render', surface = self._surface)
-        if self.visible:
+        if self.visible and self.width > 0 and self.height > 0:
             self.render(surface)
         
     def render(self, surface):
-        pass
+        blitter = pygame.Surface.blit
+        blitter(surface, self._surface, (self.x, self.y, self.width, self.height))
     
     def pre_render(self, surface):
         pass

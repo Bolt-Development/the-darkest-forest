@@ -15,6 +15,7 @@ class Scene(PubSub, ParentChild):
         ParentChild.__init__(self)
         
         self.name = name
+        self._x = self._y = 0
         self._width = self._height = self._x = self._y = 0
         
         self._surface = False
@@ -87,4 +88,20 @@ class Scene(PubSub, ParentChild):
         if isinstance(parent, Stage):
             self.stage = parent
             self.emit('added_to_stage')
+            
+    def _get_x(self):
+        return self._x
+    
+    def _set_x(self, value):
+        self._x = value
+        self.emit('moved')
+    x = property(_get_x, _set_x)
+    
+    def _get_y(self):
+        return self._y
+    
+    def _set_y(self, value):
+        self._y = value
+        self.emit('moved')
+    y = property(_get_y, _set_y)
         
