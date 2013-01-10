@@ -11,22 +11,26 @@ class ParentChild(object):
             if child == self or child in self._children:
                 continue
             
-            self._children.append(child)
-            if child._parent is not None and child._parent != self:
-                child._parent.remove_child(child)
+            old_parent = child._parent
+            if old_parent is not None and old_parent != self:
+                old_parent._children.remove(child)
+                old_parent.on_child_removed(child)
                 
-            child.parent = self
+            
+            child._parent = self
+            self._children.append(child)
             self.on_child_added(child)
+            
+            child.on_parent_changed(self, old_parent)
             
     def remove_child(self, *children):
         for child in children:
-            if child == self:
-                continue
-            
-            if child in self.children:
+            if child in self._children:
                 self._children.remove(child)
-                if child._parent == self:
-                    child.parent = None
+                
+                child._parent = None
+                child.on_parent_changed(None, self)
+                
                 self.on_child_removed(child)
                 
     def clear_children(self):
@@ -39,19 +43,7 @@ class ParentChild(object):
     
     def _get_parent(self):
         return self._parent
-    def _set_parent(self, parent):
-        old_parent = self._parent
-        if parent == self or parent == self._parent:
-            return
-        
-        self._parent = parent
-        
-        if old_parent is not None:
-            old_parent.remove_child(self)
-            
-        self.on_parent_changed(parent, old_parent)
-        
-    parent = property(_get_parent, _set_parent)
+    parent = property(_get_parent)
     
     def on_child_added(self, child):
         pass

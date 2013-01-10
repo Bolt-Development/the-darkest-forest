@@ -34,7 +34,7 @@ if __name__ == '__main__':
                 menu1.remove_child(next_scene)
             else:
                 print 'adding'
-                next_scene.parent = menu1
+                menu1.add_child(next_scene)
             print 'after', next_scene.parent
 
         def on_scene_next(event, **kwargs):
