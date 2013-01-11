@@ -13,11 +13,12 @@ import re
 class BaseTextView(ElementView):
     def __init__(self, model):
         ElementView.__init__(self, model)
-        self._model.on('change', self.on_change)
+        self._model.on('changed', self.on_change)
         
         self.dirty = True
         
     def on_change(self, even, **kwargs):
+        self.make_dirty()   # change emits in this method
         self.dirty = True
         
     def init_surface(self):
@@ -31,16 +32,14 @@ class BaseTextView(ElementView):
         rot = pygame.transform.rotate
         
         self._surface = font.render(text, True, color)
-        self._surface = scalar(self._surface, [int(x) for x in (self._width, self._height)])
+        self._surface = scalar(self._surface, [int(x) for x in (self.width, self.height)])
         self._surface = rot(self._surface, self._rotation)
-        
         
         self.dirty = False
         
     def on_render(self, event, **kwargs):
         if self.dirty: 
             self.init_surface()
-            self.emit('change')
         
         ElementView.on_render(self, event, **kwargs)
             
@@ -78,7 +77,7 @@ class ParagraphView(ElementView):
     def __init__(self, model, width=300):
         ElementView.__init__(self, model)
         
-        self._model.on('change', self.on_model_changed)
+        self._model.on('changed', self.on_model_changed)
         
         self._offset_x = self._offset_y = 6
         
@@ -87,6 +86,7 @@ class ParagraphView(ElementView):
         
         self._surface = None
         self._width = width
+        self.fixed_width = True
         
         self.ignore_in_phrases = []
     
@@ -170,6 +170,7 @@ class ParagraphView(ElementView):
                 x += child.width + self._offset_x
             else:
                 x + self._offset_x
+                
         self._height = y + max_height + self._offset_y * 2
     
     

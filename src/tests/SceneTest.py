@@ -23,25 +23,18 @@ if __name__ == '__main__':
 
     def on_init(event, **kwargs):
         def on_click(event, **kwargs):
-            button.text = 'oops, !'
-
+            if next_scene.parent == menu1:
+                menu1.remove_child(next_scene)
+                button.text = 'oops, click me again to bring it back!'
+            else:
+                menu1.add_child(next_scene)
+                button.text = 'Click me'
+                
             button.x = stage.width * 0.5 - button.width * 0.5
             button.y = stage.height * 0.5 - button.height * 0.5
 
-            print 'before', next_scene.parent
-            if next_scene.parent == menu1:
-                print 'removing'
-                menu1.remove_child(next_scene)
-            else:
-                print 'adding'
-                menu1.add_child(next_scene)
-            print 'after', next_scene.parent
-
         def on_scene_next(event, **kwargs):
             ScrollTransition(menu1, menu2).start(stage)
-            
-        text = 'Click me'
-        count = 0
     
         button = Button(TextModel(font, "Click Me", 24))
         button.on('mouse_clicked', on_click)

@@ -26,11 +26,11 @@ class ElementModel(PubSub, ParentChild):
     
     def on_child_added(self, child):
         self._size_dirty = True
-        self.emit('change')
+        self.emit('changed')
     
     def on_child_removed(self, child):
         self._self_dirty = True
-        self.emit('change')
+        self.emit('changed')
     
     def on_parent_changed(self, parent, old_parent):
         pass    # TODO check for instance of Stage, call on_added_to_stage for self and children

@@ -40,6 +40,8 @@ class ElementView(PubSub, ParentChild):
         self._size_dirty = False
         self._global_dirty = False
         
+        self.fixed_width = self.fixed_height = False
+        
         self.mouse_over = False
         self.mouse_down_on = False
         self._last_known_mouse = None
@@ -78,8 +80,13 @@ class ElementView(PubSub, ParentChild):
     y = property(_get_y, _set_y)
     
     def _calculate_size(self):
-        self._width = self._model.width * self._scale_x
-        self._height = self._model.height * self._scale_y
+        if self._model is not None:
+            if not self.fixed_width:
+                self._width = self._model.width * self._scale_x
+            if not self.fixed_height:
+                self._height = self._model.height * self._scale_y
+            
+        self._scale_dirty = False
     
     def _get_scale_x(self):
         if self._scale_dirty:
@@ -136,46 +143,55 @@ class ElementView(PubSub, ParentChild):
             max_width = max(child.x + child.width, max_width)
             max_height = max(child.y + child.height, max_height)
             
-            
         self._inner_width = max_width
         self._inner_height = max_height
         
         self._size_dirty = False
     
     def _get_width(self):
+        if self._scale_dirty:
+            self._calculate_size()
         if self._size_dirty:
             self._get_inner_size()
         return max(self._width, self._inner_width) # * scale?
     
     def _set_width(self, value):
         self._width = value
+        self.emit('changed')
         self._size_dirty = True
         
     width = property(_get_width, _set_width)
         
     def _get_height(self):
+        if self._scale_dirty:
+            self._calculate_size()
         if self._size_dirty:
             self._get_inner_size()
         return max(self._height, self._inner_height)
     
     def _set_height(self, value):
         self._height = value
+        self.emit('changed')
         self._size_dirty = True
     height = property(_get_height, _set_height)
+    
+    def on_child_changed(self, event, **kwargs):
+        self.make_dirty()
     
     def make_dirty(self):
         self._size_dirty = True
         self._scale_dirty = True
+        self.emit('changed')
     
     def on_child_added(self, child):
         self._size_dirty = True
-        child.on('change', self.make_dirty)
+        child.on('changed', self.on_child_changed)
         # TODO :: consider listening for moved events
         self.emit('child_added', child = child)
     
     def on_child_removed(self, child):
         self._size_dirty = True
-        child.remove('change', self.make_dirty)
+        child.remove('changed', self.on_child_changed)
         self.emit('child_removed', child = child)
     
     def on_parent_changed(self, parent, old_parent):
@@ -253,7 +269,6 @@ class ElementView(PubSub, ParentChild):
             if self._surface.get_width() != self.width or self._surface.get_height() != self.height:
                 # consider a copy of the old (too small) surface
                 self._surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
-                self.emit('change')
             
             if self.show_border:
                 self._surface.fill(self.border_color, (0, 0, self.width, self.height))

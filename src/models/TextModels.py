@@ -23,7 +23,8 @@ class TextModel(PubSub):
             self.set_text(self._text)
         except:
             self.set_text('')
-        self.emit('change')
+        self.emit('changed')
+        
     def get_font(self):
         return self._font
     font = property(get_font)
@@ -40,14 +41,14 @@ class TextModel(PubSub):
     def set_text(self, text):
         self._text = text
         self._width, self._height = self._font.size(self._text)
-        self.emit('change')
+        self.emit('changed')
     text = property(get_text, set_text)
             
     def get_color(self):
         return self._color
     def set_color(self, color, emit=True):
         self._color = color
-        self.emit('change')
+        self.emit('changed')
     color = property(get_color, set_color)
     
     def get_width(self):
