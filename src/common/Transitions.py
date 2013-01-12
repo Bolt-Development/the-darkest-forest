@@ -3,16 +3,21 @@ from Timer import *
 
 class Transition(PubSub):
     def __init__(self, current, next):
+        PubSub.__init__(self)
         self.current = current
         self.next = next
         
         self.timer = Timer()
         self.timer.on('tick', self.on_timer)
         self.timer.on('finished', self.on_timer_finished)
+        self.timer.on('started', self.on_timer_started)
         
     def start(self, update_emitter, delay=0, duration='infinite', interval=0, repeats='infinite', message_type='tick'):
         self.emitter = update_emitter
         self.timer.start(update_emitter, delay, duration, interval, repeats, message_type)
+        
+    def on_timer_started(self):
+        self.emit('started')
         self.on_start()
         
     def on_start(self):
@@ -33,6 +38,7 @@ class ScrollTransition(Transition):
         self.speed = 1
         
     def on_start(self):
+        print 'start'
         self.position()
         self.emitter.add_child(self.next)
         
@@ -43,10 +49,12 @@ class ScrollTransition(Transition):
         self.next.y = self.current.y
         
     def on_timer(self):
+        print 'tick'
         if self.next.x == self.target_x and self.next.y == self.target_y:
             print 'stopping'
             self.timer.stop()
         else:
+            print 'moving'
             self.next.x -= self.speed
             
             self.current.x -= self.speed
