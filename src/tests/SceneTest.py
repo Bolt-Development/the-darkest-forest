@@ -35,7 +35,6 @@ if __name__ == '__main__':
 
         def on_scene_next(event, **kwargs):
             ScrollTransition(menu1, menu2).start()
-            print 'click'
     
         button = Button(TextModel(font, "Click Me", 24))
         button.on('mouse_clicked', on_click)
