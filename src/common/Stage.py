@@ -9,19 +9,26 @@ class Stage(Engine, ParentChild):
         Engine.__init__(self, width, height)
         ParentChild.__init__(self)
         
+        self._do_once = True
         self.last_mouse_down_target = None
+        self.on_stage = True    # views climbing up their ancestors need this
         
     def start(self, scene, start_paused = False):
-        self.add_child(scene)
+        self.first_child = scene
         Engine.start(self, start_paused)
         # nothing after here gets called until engine.stop has been called!
+    
+    def init(self):
+        Engine.init(self)
+        self.add_child(self.first_child)
     
     def on_child_removed(self, scene):
         print 'removed scene', scene.name
     
     def on_child_added(self, scene):
-        if len(self.children) == 0:
+        if self._do_once:
             scene.enter(None)
+            self._do_once = False   # call enter on the start arguement
         print 'scene added to stage', scene.name
 
     def emit(self, message_type, **kwargs):
@@ -41,8 +48,13 @@ class Stage(Engine, ParentChild):
         elif message_type == 'mouse_motion':
             # TODO :: mouse dragging
             pass 
+        elif message_type == 'render' or message_type == 'tick':
+            Engine.emit(self, message_type, **kwargs)
+            return
         
         for child in self.children:
+            if child.transitioning:
+                continue
             kwargs['scene'] = child
             child.emit(message_type, **kwargs)
             

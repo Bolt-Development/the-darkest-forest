@@ -263,7 +263,10 @@ class ElementView(PubSub, ParentChild):
             
     def on_render(self, event, **kwargs):
         surface = kwargs['surface']
-                
+        
+        if not self.visible:
+            return
+        
         self.pre_render(surface)
         if self._surface is not None:
             if self._surface.get_width() != self.width or self._surface.get_height() != self.height:
