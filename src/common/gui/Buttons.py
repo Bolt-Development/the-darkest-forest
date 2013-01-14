@@ -21,7 +21,16 @@ class Button(ElementView):
         
         self.show_background = True
         self.show_border = True
-    
+        
+        
+        
+    def _get_color(self):
+        return self.border_color
+    def _set_color(self, value):
+        self._text_view.color = value
+        self.border_color = value
+    color = property(_get_color, _set_color)
+        
     def _get_inner_size(self):
         ElementView._get_inner_size(self)
         

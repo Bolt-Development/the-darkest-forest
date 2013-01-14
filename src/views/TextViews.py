@@ -108,6 +108,8 @@ class ParagraphView(ElementView):
                 continue
                 
             clean_word = word.translate(string.maketrans('', ''), string.punctuation)
+            if len(clean_word) == 0:
+                continue
                 
             # strip punctuation before the word
             for character in word:

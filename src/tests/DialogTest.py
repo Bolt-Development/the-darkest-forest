@@ -17,8 +17,7 @@ if __name__ == '__main__':
     
     fonts = ResourceLoader().load_resources_by_type('font')
 
-    import random
-    font = fonts[random.randint(0, len(fonts) - 1)]
+    font = fonts[0]
 
     def on_init(event, **kwargs):
         dialog = Dialog(TextModel(font, 'Make a choice, please. The choice ' +
@@ -29,12 +28,46 @@ if __name__ == '__main__':
         
         choose = ChooseDialog(TextModel(font, 'Choose your difficulty', 24), 'easy', 'medium', 'hard')
 
+        def on_hard(event, **kwargs):
+            long_str = \
+                'Vast Active Living Intelligence System: A ' + \
+                'perturbation in the reality field in which a ' + \
+                'spontaneous self-monitoring negentropic vortex ' + \
+                'is formed, tending progressively to subsume ' + \
+                'and incorporate its environment into arrangements ' + \
+                'of information. Characterized by quasi-consciousness, ' + \
+                'purpose, intelligence, growth, and an armillary coherence.'
+            
+
+            choose.text = long_str
+
+        def on_easy(event, **kwargs):
+            choose.text = 'Nothing good is easy.'
+
+        def on_medium(event, **kwargs):
+            choose.text = 'Most people return small favors, acknowledge ' + \
+                          'medium ones and repay greater ones - with ingratitude.'
+
+        choose.on('easy_selected', on_easy)
+        choose.on('medium_selected', on_medium)
+        choose.on('hard_selected', on_hard)
+
         def on_okay(event, **kwargs):
             scene.add_child(choose)
+            choose.visible = True
 
         def on_changed(event, **kwargs):
             dialog.center(scene)
+            choose.center(scene)
+
+        def on_choose_cancel(event, **kwargs):
+            print 'here'
+            dialog.visible = True
+
+        choose.on('cancel', on_choose_cancel)
+            
         dialog.on('changed', on_changed)
+        choose.on('changed', on_changed)
         dialog.on('okay', on_okay)
 
         scene.add_child(dialog)

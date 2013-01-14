@@ -47,6 +47,7 @@ class Dialog(ElementView):
                     
             if not found:
                 button = Button(TextModel(model.resource, choice, model.size))
+                button.on('mouse_clicked', self.on_choice_made)
             
             x -= button.width + self._offset_x
             if x < self._offset_x:
@@ -55,7 +56,6 @@ class Dialog(ElementView):
             
             button.x = x
             button.y = y
-            button.on('mouse_clicked', self.on_choice_made)
             
             self.add_child(button)
             
@@ -77,7 +77,12 @@ class Dialog(ElementView):
         return self.paragraph.text
     def _set_text(self, value):
         self.paragraph.text = value
+        print 'text changed'
     text = property(_get_text, _set_text)
+    
+class Confirm(Dialog):
+    def __init__(self, text_model, width=300):
+        Dialog.__init__(self, text_model, width, 'okay')
     
 class ChooseDialog(ElementView):
     def __init__(self, text_model, *choices):
@@ -90,9 +95,14 @@ class ChooseDialog(ElementView):
         self.dialog.show_border = False
         self.add_child(self.dialog)
         
+        self.dialog.on('changed', self.on_dialog_changed)
+        self.dialog.on('choice_made', self.on_choice_made)
+        
         self._offset_x = self._offset_y = 15
         self.choices = choices
         self.init_choices()
+        
+        self.choice = None
         
     def init_choices(self):
         model = self.dialog.paragraph._model
@@ -113,10 +123,10 @@ class ChooseDialog(ElementView):
                     
             if not found:
                 button = Button(TextModel(model.resource, choice, model.size))
+                button.on('mouse_clicked', self.change_choice)
             
             button.x = x
             button.y = y
-            button.on('mouse_clicked', self.change_choice)
             
             y += button.height + self._offset_y
             
@@ -127,17 +137,57 @@ class ChooseDialog(ElementView):
         self.dialog.x = max_width + self._offset_x
         
         self._width = self.dialog.x + self.dialog.width + self._offset_x
-        self._height = y + button.height + self._offset_y
+        
+        if y > self.dialog.paragraph.y + self.dialog.paragraph.height:
+            self.dialog._paragraph_offset_y = y - (self.dialog.paragraph.y + self.dialog.height)
+            self._height = y + self._offset_y
+        else:
+            self.dialog._paragraph_offset_y = 0
+            self._height = self.dialog.y + self.dialog.height + self._offset_y
+
         self.emit('changed')
         
         
     def change_choice(self, event, **kwargs):
-        print kwargs['target']
+        button = kwargs['target']
         
+        if self.choice is not None:
+            self.choice.color = (255, 255, 255)
         
+        if button != self.choice:
+            button.color = (255, 255, 51)
+            self.choice = button
+        else:
+            button.color = (255, 255, 255)
+            self.choice = None
+            
+        if self.choice is not None:
+            self.emit(self.choice.text + '_selected')
+        else:
+            self.emit('nothing_selected')
+            
         
+    def on_choice_made(self, event, **kwargs):
+        choice = kwargs['choice']
+        if self.choice is None or choice == 'cancel':
+            self.emit('choice_made', choice = 'nothing')
+            self.emit('nothing') 
+            self.emit('cancel')
+        else:
+            self.emit('choice_made', choice = self.choice.text)
+            self.emit(self.choice.text)
+            
+        self.visible = False
         
+    def _get_text(self):
+        return self.dialog.text
+    def _set_text(self, value):
+        self.dialog.text = value
+    text = property(_get_text, _set_text)
         
+    def on_dialog_changed(self, event, **kwargs):
+        ElementView.on_child_changed(self, event, **kwargs)
+        self.init_choices()
         
         
         

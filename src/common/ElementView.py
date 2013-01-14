@@ -46,7 +46,7 @@ class ElementView(PubSub, ParentChild):
         self.mouse_down_on = False
         self._last_known_mouse = None
         
-        self.visible = True
+        self._visible = True
         self.z_order = 0
         
         
@@ -202,6 +202,8 @@ class ElementView(PubSub, ParentChild):
             old_parent.remove('mouse_clicked', self.on_mouse_clicked_in_parent)
             old_parent.remove('added_to_stage', self.on_added_to_stage)
             old_parent.remove('removed_from_stage', self.on_removed_from_stage)
+            old_parent.remove('visible', self.on_parent_visible)
+            old_parent.remove('hidden', self.on_parent_hidden)
             
             if self.on_stage:
                 self.on_removed_from_stage()
@@ -214,6 +216,8 @@ class ElementView(PubSub, ParentChild):
             parent.on('mouse_clicked', self.on_mouse_clicked_in_parent)
             parent.on('added_to_stage', self.on_added_to_stage)
             parent.on('removed_from_stage', self.on_removed_from_stage)
+            parent.on('visible', self.on_parent_visible)
+            parent.on('hidden', self.on_parent_hidden)
             
             up = parent
             while up is not None:
@@ -232,6 +236,12 @@ class ElementView(PubSub, ParentChild):
         
     def on_parent_moved(self, event, **kwargs):
         self._global_dirty = True
+        
+    def on_parent_hidden(self, event, **kwargs):
+        self.visible = False
+        
+    def on_parent_visible(self, event, **kwargs):
+        self.visible = True
             
     def on_mouse_moved_in_parent(self, event, **kwargs):
         x, y = kwargs['position']
@@ -310,4 +320,15 @@ class ElementView(PubSub, ParentChild):
     def center(self, other):
         self.x = other.width * 0.5 - self.width * 0.5
         self.y = other.height * 0.5 - self.height * 0.5
+        
+    def _get_visible(self):
+        return self._visible
+    def _set_visible(self, value):
+        if value != self._visible:
+            if value:
+                self.emit('visible')
+            else:
+                self.emit('hidden')
+            self._visible = value
+    visible = property(_get_visible, _set_visible)
     
