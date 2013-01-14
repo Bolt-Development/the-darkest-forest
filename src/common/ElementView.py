@@ -271,6 +271,7 @@ class ElementView(PubSub, ParentChild):
         if self._surface is not None:
             if self._surface.get_width() != self.width or self._surface.get_height() != self.height:
                 # consider a copy of the old (too small) surface
+                print self, self.width, self.height, self._inner_height
                 self._surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
             
             mod = 0

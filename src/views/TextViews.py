@@ -172,6 +172,7 @@ class ParagraphView(ElementView):
                 x + self._offset_x
                 
         self._height = y + max_height + self._offset_y * 2
+        self.emit('changed')
     
     
     def on_model_changed(self, event, **kwargs):

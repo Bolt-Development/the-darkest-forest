@@ -15,7 +15,7 @@ class Button(ElementView):
         
         self._text_view = TextView(text_model)
         self._text_view.x = self._offset_x
-        self._text_view.y = self._offset_y * 2
+        self._text_view.y = self._offset_y
         
         self.add_child(self._text_view)
         
