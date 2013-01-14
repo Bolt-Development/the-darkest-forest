@@ -252,7 +252,7 @@ class ElementView(PubSub, ParentChild):
                 self.mouse_over = False
                 self.emit("mouse_exited")
         self._last_known_mouse = (x, y)
-                
+            
     def on_mouse_clicked_in_parent(self, event, **kwargs):
         down_x, down_y = kwargs['down_target']
         up_x, up_y = kwargs['up_target']
@@ -273,14 +273,25 @@ class ElementView(PubSub, ParentChild):
                 # consider a copy of the old (too small) surface
                 self._surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
             
+            mod = 0
             if self.show_border:
-                self._surface.fill(self.border_color, (0, 0, self.width, self.height))
+                draw_line = pygame.draw.line
+                
+                bw = self.width - self.border_size
+                bh = self.height - self.border_size
+                draw_line(self._surface, self.border_color, (0, 0), (bw, 0), self.border_size)
+                draw_line(self._surface, self.border_color, (bw, 0), (bw, bh), self.border_size)
+                draw_line(self._surface, self.border_color, (bw, bh), (0, bh), self.border_size)
+                draw_line(self._surface, self.border_color, (0, 0), (0, bh), self.border_size)
+                mod = self.border_size
                 
             if self.show_background:
-                self._surface.fill(self.background_color, (self.border_size, 
-                                                           self.border_size, 
-                                                           self.width - self.border_size * 2, 
-                                                           self.height - self.border_size * 2))
+                color = self.background_color
+                    
+                self._surface.fill(color, (self.border_size, 
+                                           self.border_size, 
+                                           self.width - mod * 2, 
+                                           self.height - mod * 2))
                 
         self.emit('render', surface = self._surface)
         if self.visible and self.width > 0 and self.height > 0:

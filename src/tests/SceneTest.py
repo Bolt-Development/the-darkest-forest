@@ -11,6 +11,7 @@ if __name__ == '__main__':
     
     from common.gui.Buttons import *
     from models.TextModels import *
+    from views.TextViews import *
     from ResourceLoader import *
     
     fonts = ResourceLoader().load_resources_by_type('font')
@@ -47,9 +48,49 @@ if __name__ == '__main__':
 
         next_scene.x = stage.width * 0.5 - button.width * 0.5
         next_scene.y = button.y + button.height + 10
+
+        mouse_over_scene_1 = Scene("Mouse Over Scene One")
+        mouse_over_scene_1.width = 200
+        mouse_over_scene_1.height = 200
+        mouse_over_scene_1.x = 100
+        mouse_over_scene_1.y = 57
+
+        mouse_over_scene_2 = Scene("Mouse Over Scene One")
+        mouse_over_scene_2.width = mouse_over_scene_1.width
+        mouse_over_scene_2.height = mouse_over_scene_1.height
+        mouse_over_scene_2.fill_color=(150, 150, 150)
+
+        paragraph = ParagraphView(TextModel(font, "This could contain a description of the moused over element!", 24), mouse_over_scene_2.width - 20)
+        paragraph.show_background = False
+        paragraph.show_border = False
+
+        paragraph.x = 10
+        paragraph.y = 10
+
+        mouse_over_scene_2.add_child(paragraph)
+        
+        mouse_over_button = Button(TextModel(font, "Mouse Over", 24))
+        mouse_over_button.show_background = False
+        mouse_over_scene_1.add_child(mouse_over_button)
+
+        def on_mouse_over(event, **kwargs):
+            def on_finished(event, **kwargs):
+                mouse_over_scene_2.on('mouse_exited', on_mouse_over2)
+                
+            mouse_over_scene_2.once('transitioning_finished', on_finished)
+            ScrollTransition(mouse_over_scene_1, mouse_over_scene_2, 0, -1).start()
+            
+        mouse_over_button.on('mouse_entered', on_mouse_over)
+
+        def on_mouse_over2(event, **kwargs):
+            ScrollTransition(mouse_over_scene_2, mouse_over_scene_1, 0, 1).start()
+
+        mouse_over_button.x = mouse_over_scene_1.width * 0.5 - mouse_over_button.width * 0.5
+        mouse_over_button.y = 14
         
         menu1.add_child(button)
         menu1.add_child(next_scene)
+        menu1.add_child(mouse_over_scene_1)
 
     def on_init2(event, **kwargs):
         def on_scene_back(event, **kwargs):

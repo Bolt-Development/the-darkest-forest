@@ -21,6 +21,7 @@ class Transition(PubSub):
             return
         
         if self.current.transitioning or self.next.transitioning:
+            print 'stopping'
             return
         
         self.emitter = self.current._stage

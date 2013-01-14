@@ -79,8 +79,10 @@ class Scene(ElementView):
     
     def _set_transitioning(self, value):
         if value != self._transitioning:
-            self._transitioning = value
             if value:
                 self._trans_rect = [self.x, self.y, self.width, self.height]
-            self.emit('transitioning')
+                self.emit('transitioning')
+            elif self._transitioning and not value:
+                self.emit('transitioning_finished')
+            self._transitioning = value
     transitioning = property(_get_transitioning, _set_transitioning)
