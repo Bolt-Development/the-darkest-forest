@@ -23,9 +23,20 @@ if __name__ == '__main__':
     def on_init(event, **kwargs):
         dialog = Dialog(TextModel(font, 'Make a choice, please. The choice ' +
                                         'you make is not as important as ' +
-                                        'making the choice. It is better to ' +
-                                        'do something and be afraid than to ' +
-                                        'live with the fear of doing it.', 24), 425, 'okay', 'cancel')
+                                        'making the choice.\n\nIt is better to ' +
+                                        'do something and be afraid, than to ' +
+                                        'live with the fear of doing it.', 24), 625, 'okay', 'cancel')
+        
+        choose = ChooseDialog(TextModel(font, 'Choose your difficulty', 24), 'easy', 'medium', 'hard')
+
+        def on_okay(event, **kwargs):
+            scene.add_child(choose)
+
+        def on_changed(event, **kwargs):
+            dialog.center(scene)
+        dialog.on('changed', on_changed)
+        dialog.on('okay', on_okay)
+
         scene.add_child(dialog)
     
     stage = Stage()

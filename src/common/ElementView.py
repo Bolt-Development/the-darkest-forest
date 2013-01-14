@@ -254,6 +254,9 @@ class ElementView(PubSub, ParentChild):
         self._last_known_mouse = (x, y)
             
     def on_mouse_clicked_in_parent(self, event, **kwargs):
+        if not self.visible:
+            return
+        
         down_x, down_y = kwargs['down_target']
         up_x, up_y = kwargs['up_target']
         
@@ -271,7 +274,6 @@ class ElementView(PubSub, ParentChild):
         if self._surface is not None:
             if self._surface.get_width() != self.width or self._surface.get_height() != self.height:
                 # consider a copy of the old (too small) surface
-                print self, self.width, self.height, self._inner_height
                 self._surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
             
             mod = 0
@@ -304,4 +306,8 @@ class ElementView(PubSub, ParentChild):
     
     def pre_render(self, surface):
         pass
+    
+    def center(self, other):
+        self.x = other.width * 0.5 - self.width * 0.5
+        self.y = other.height * 0.5 - self.height * 0.5
     

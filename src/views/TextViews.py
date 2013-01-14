@@ -84,7 +84,6 @@ class ParagraphView(ElementView):
         self.last_text = None
         self.model_dirty = True
         
-        self._surface = None
         self._width = width
         self.fixed_width = True
         
@@ -189,12 +188,7 @@ class ParagraphView(ElementView):
     def pre_render(self, surface):
         if self.model_dirty or self._size_dirty:
             self.init_words()
-            self._surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
             self.model_dirty = False
-            
-    def render(self, surface):
-        blitter = pygame.Surface.blit
-        blitter(surface, self._surface, (self.x, self.y, self.width, self.height))
         
     def views_for_word(self, word):
         return [child for child in self.children if child._model.text == word]
@@ -202,3 +196,11 @@ class ParagraphView(ElementView):
     def views_for_phrase(self, phrase):
         words = phrase.split()
         # TODO
+        
+        
+    def _get_text(self):
+        return self._model.text
+    def _set_text(self, value):
+        self._model.text = value
+    text = property(_get_text, _set_text)
+    
