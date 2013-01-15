@@ -12,8 +12,8 @@ if __name__ == '__main__':
 
     from ResourceLoader import *
 
-    instructions = ['Press <- and -> to decrease / increase paragraph width',
-                    'Press Up and Down to increase / decrease font size']
+    instructions = ['Press Left or Right to decrease / increase paragraph width',
+                    'Press Up or Down to increase / decrease font size']
 
     long_string = \
         """

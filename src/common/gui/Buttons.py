@@ -22,7 +22,14 @@ class Button(ElementView):
         self.show_background = True
         self.show_border = True
         
+    def on_mouse_clicked(self, event, **kwargs):
+        print 'click', self.text
         
+    def on_mouse_entered(self, event, **kwargs):
+        print 'enter', self.text
+    
+    def on_mouse_exited(self, event, **kwargs):
+        print 'exit', self.text
         
     def _get_color(self):
         return self.border_color

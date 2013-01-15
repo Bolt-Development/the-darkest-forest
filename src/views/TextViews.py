@@ -72,6 +72,9 @@ class TextView(BaseTextView):
         blitter = pygame.Surface.blit
         blitter(surface, self._surface, (self.x, self.y, self.width, self.height))
         
+    def on_mouse_entered(self, event, **kwargs):
+        print self.text
+        
         
 class ParagraphView(ElementView):
     def __init__(self, model, width=300):
@@ -174,7 +177,6 @@ class ParagraphView(ElementView):
                 
         self._height = y + max_height + self._offset_y * 2
         self.emit('changed')
-    
     
     def on_model_changed(self, event, **kwargs):
         self.model_dirty = True

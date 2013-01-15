@@ -54,10 +54,8 @@ class ElementView(PubSub, ParentChild):
         self.on_stage = False
         
         
-    def is_point_inside(self, x, y, use_global_position=False):
+    def is_point_inside(self, x, y):
         _x, _y = self._x, self._y
-        if use_global_position:
-            _x, _y = self.global_x, self.global_y
         return x >= _x and x <= _x+ self.width and y >= _y and y <= _y + self.height
     
     def _get_x(self):
@@ -175,23 +173,34 @@ class ElementView(PubSub, ParentChild):
         self._size_dirty = True
     height = property(_get_height, _set_height)
     
-    def on_child_changed(self, event, **kwargs):
-        self.make_dirty()
+    def _on_child_changed(self, event, **kwargs):
+        self._size_dirty = True
+        self._scale_dirty = True
+        self.on_child_changed(event, **kwargs)
+        self.emit('changed')
+    
+    def on_child_changed(self, event, **kwargs):    # for overriding
+        pass
     
     def make_dirty(self):
         self._size_dirty = True
         self._scale_dirty = True
         self.emit('changed')
     
+    def on_child_moved(self):
+        self._size_dirty = True
+    
     def on_child_added(self, child):
         self._size_dirty = True
-        child.on('changed', self.on_child_changed)
+        child.on('changed', self._on_child_changed)
+        child.on('moved', self.on_child_moved)
         # TODO :: consider listening for moved events
         self.emit('child_added', child = child)
     
     def on_child_removed(self, child):
         self._size_dirty = True
-        child.remove('changed', self.on_child_changed)
+        child.remove('changed', self._on_child_changed)
+        child.remove('moved', self.on_child_moved)
         self.emit('child_removed', child = child)
     
     def on_parent_changed(self, parent, old_parent):
@@ -242,14 +251,26 @@ class ElementView(PubSub, ParentChild):
         
     def on_parent_visible(self, event, **kwargs):
         self.visible = True
+        
+    def to_local_position(self, position):
+        gx, gy = position
+        
+        parent = self.parent
+        while parent is not None:
+            gx -= parent.x
+            gy -= parent.y
+            
+            parent = parent.parent
+            
+        return gx, gy
             
     def on_mouse_moved_in_parent(self, event, **kwargs):
+        if not self.visible:
+            return
+        
         x, y = kwargs['position']
         
-        _x, _y = x, y   # remove this later (used during testing)
-        if self.parent is not None:
-            _x = x - self.parent.x
-            _y = y - self.parent.y
+        _x, _y = self.to_local_position(kwargs['position'])
             
         if self.is_point_inside(_x, _y):
             if self.mouse_over:
@@ -257,22 +278,35 @@ class ElementView(PubSub, ParentChild):
             else:
                 self.mouse_over = True
                 self.emit('mouse_entered')
+                self.on_mouse_entered(event, **kwargs)
         else:
             if self.mouse_over:
                 self.mouse_over = False
                 self.emit("mouse_exited")
+                self.on_mouse_exited(event, **kwargs)
         self._last_known_mouse = (x, y)
             
+    def on_mouse_entered(self, event, **kwargs):
+        pass
+    
+    def on_mouse_exited(self, event, **kwargs):
+        pass
+    
     def on_mouse_clicked_in_parent(self, event, **kwargs):
         if not self.visible:
             return
         
-        down_x, down_y = kwargs['down_target']
-        up_x, up_y = kwargs['up_target']
+        down_x, down_y = self.to_local_position(kwargs['down_target'])
+        up_x, up_y = self.to_local_position(kwargs['up_target'])
         
-        if self.is_point_inside(down_x, down_y, True) and self.is_point_inside(up_x, up_y, True):
+        if self.is_point_inside(down_x, down_y) and self.is_point_inside(up_x, up_y):
             kwargs['target'] = self
             self.propagate(event, **kwargs)
+            
+            self.on_mouse_clicked(event, **kwargs)
+            
+    def on_mouse_clicked(self, event, **kwargs):
+        pass
             
     def on_render(self, event, **kwargs):
         surface = kwargs['surface']
