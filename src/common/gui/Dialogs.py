@@ -50,6 +50,9 @@ class Dialog(ElementView):
         self.visible = False
         
     def on_child_changed(self, event, **kwargs):
+        self.position_elements()
+        
+    def position_elements(self):
         self.choice_layout.x = max(self.choice_layout.x, self.width - self.choice_layout.width - self._offset_x)
         self.choice_layout.y = max(self.choice_layout.y, self.paragraph.y + self.paragraph.height)
         self._height = self.choice_layout.y + self.choice_layout.height + self._offset_y
@@ -150,6 +153,9 @@ class ChooseDialog(ElementView):
         under_paragraph = self.dialog.paragraph.y + self.dialog.paragraph.height
         
         self.dialog.choice_layout.y = max(under_layout, under_paragraph)
+        self.dialog.position_elements()
+        
+        self._height = self.dialog.y + self.dialog.height + self._offset_y
         self.emit('changed')
         
         

@@ -27,7 +27,21 @@ if __name__ == '__main__':
                                         'live with the fear of doing it.', 24), 625, 'okay', 'cancel')
         
         choose = ChooseDialog(TextModel(font, 'Choose your difficulty', 24), 'easy', 'medium', 'hard')
+        
+        def on_choice_made(event, **kwargs):
+            choice = kwargs['choice']
 
+            text = 'You decided on ' + choice + '.'
+            if choice == 'nothing':
+                text = 'You must choose something!'
+            
+            confirm = Confirm(TextModel(font, text, 24))
+            confirm.x = confirm.y = 120
+            scene.add_child(confirm)
+            confirm.visible = True
+
+        choose.on('choice_made', on_choice_made)
+            
         def on_hard(event, **kwargs):
             long_str = \
                 'Vast Active Living Intelligence System: A ' + \
@@ -71,6 +85,16 @@ if __name__ == '__main__':
         dialog.on('okay', on_okay)
 
         scene.add_child(dialog)
+
+        scene.add_child(
+            TextView(
+                TextModel(font, "This test shows how to follow events " +
+                                "on dialogs, if no dialogs are visible, " +
+                                "then restart the test.", 12
+                          )
+                )
+            )
+                
     
     stage = Stage()
     

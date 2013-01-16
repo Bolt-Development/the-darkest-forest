@@ -72,9 +72,6 @@ class TextView(BaseTextView):
         blitter = pygame.Surface.blit
         blitter(surface, self._surface, (self.x, self.y, self.width, self.height))
         
-    def on_mouse_entered(self, event, **kwargs):
-        print self.text
-        
         
 class ParagraphView(ElementView):
     def __init__(self, model, width=300):
