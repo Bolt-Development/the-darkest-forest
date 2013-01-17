@@ -5,7 +5,7 @@ except:
 from ParentChild import *
 
 class Stage(Engine, ParentChild):
-    def __init__(self, width=854, height=480):
+    def __init__(self, width=1600, height=900):
         Engine.__init__(self, width, height)
         ParentChild.__init__(self)
         

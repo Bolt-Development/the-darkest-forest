@@ -21,7 +21,7 @@ class Attribute(PubSub):
         old = self._base
         self._base = value
         
-        self.emit('changed', old = old, new = self._base)
+        self.emit('changed', emitter = self, old = old, new = self._base)
     current = property(_get_current, _set_current)
     
     def _get_bonus(self):
@@ -29,7 +29,7 @@ class Attribute(PubSub):
     def _set_bonus(self, value):
         old = self._bonus_amount
         self._bonus_amount = value
-        self.emit('bonus_changed', old = old, new = self._bonus_amount)
+        self.emit('bonus_changed', emitter = self, old = old, new = self._bonus_amount)
     bonus = property(_get_bonus, _set_bonus)
     
     def _get_reduced(self):
@@ -37,7 +37,7 @@ class Attribute(PubSub):
     def _set_reduced(self, value):
         old = self._reduced_amount
         self._reduced_amount = value
-        self.emit('reduced_changed', old = old, new = self._reduced_amount)
+        self.emit('reduced_changed', emitter = self, old = old, new = self._reduced_amount)
     reduced = property(_get_reduced, _set_reduced)
     
 class AttributeModel(PubSub):
@@ -45,4 +45,26 @@ class AttributeModel(PubSub):
         PubSub.__init__(self)
         
         self.attributes = []
+        
+    def get_attribute_by_name(self, name):
+        return [attribute for attribute in self.attributes if attribute.name == name]
+    
+    def add_attribute(self, attribute):
+        self.attributes.append(attribute)
+        
+        attribute.on('changed', self.on_attribute_changed)
+        attribute.on('bonus_changed', self.on_attribute_changed)
+        attribute.on('reduced_changed', self.on_attribute_changed)
+        
+    def remove_attribute(self, attribute):
+        if attribute in self.attributes:
+            self.attributes.remove(attribute)
+            
+            attribute.remove('changed', self.on_attribute_changed)
+            attribute.remove('bonus_changed', self.on_attribute_changed)
+            attribute.remove('reduced_changed', self.on_attribute_changed)
+            
+    def on_attribute_change(self, event, **kwargs):
+        attribute = kwargs['emitter']
+        self.emit(attribute.name + '_' + event.message_type, **kwargs)
     

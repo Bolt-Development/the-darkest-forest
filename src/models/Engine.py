@@ -5,7 +5,7 @@ except:
     from common.PubSub import *
 
 class Engine(PubSub):
-    def __init__(self, width=854, height=480):
+    def __init__(self, width=1600, height=900):
         PubSub.__init__(self)
 
         self.width = width
