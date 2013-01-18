@@ -31,7 +31,7 @@ class BaseTextView(ElementView):
         scalar = pygame.transform.scale
         rot = pygame.transform.rotate
         
-        self._surface = font.render(text, True, color)
+        self._surface = font.render(text, False, color)
         self._surface = scalar(self._surface, [int(x) for x in (self.width, self.height)])
         self._surface = rot(self._surface, self._rotation)
         
@@ -85,7 +85,7 @@ class ParagraphView(ElementView):
         self.model_dirty = True
         
         self._width = width
-        self.fixed_width = True
+        self.ignore_model_size = True
         
         self.ignore_in_phrases = []
     

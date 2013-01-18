@@ -14,6 +14,9 @@ class ElementView(PubSub, ParentChild):
         self._model = model
         self._controller = controller
         
+        self._id = ElementView.next_id
+        ElementView.next_id += 1
+        
         self._x = self._y = 0
         self._gx = self._gy = 0
         self._scale_x = self._scale_y = 1.0
@@ -40,7 +43,7 @@ class ElementView(PubSub, ParentChild):
         self._size_dirty = False
         self._global_dirty = False
         
-        self.fixed_width = self.fixed_height = False
+        self.ignore_model_size = self.fixed_height = False
         
         self.mouse_over = False
         self.mouse_down_on = False
@@ -52,6 +55,9 @@ class ElementView(PubSub, ParentChild):
         
         self._stage = False
         self.on_stage = False
+        
+        self.draggable = False
+        self.dragging = False
         
         
     def is_point_inside(self, x, y):
@@ -78,11 +84,9 @@ class ElementView(PubSub, ParentChild):
     y = property(_get_y, _set_y)
     
     def _calculate_size(self):
-        if self._model is not None:
-            if not self.fixed_width:
-                self._width = self._model.width * self._scale_x
-            if not self.fixed_height:
-                self._height = self._model.height * self._scale_y
+        if self._model is not None and not self.ignore_model_size:
+            self._width = self._model.width * self._scale_x
+            self._height = self._model.height * self._scale_y
             
         self._scale_dirty = False
     
@@ -199,6 +203,10 @@ class ElementView(PubSub, ParentChild):
     
     def on_child_removed(self, child):
         self._size_dirty = True
+        
+        # this will force the old content to be removed from the surface
+        self._surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+        
         child.remove('changed', self._on_child_changed)
         child.remove('moved', self.on_child_moved)
         self.emit('child_removed', child = child)
@@ -209,6 +217,8 @@ class ElementView(PubSub, ParentChild):
             old_parent.remove('moved', self.on_parent_moved)
             old_parent.remove('mouse_motion', self.on_mouse_moved_in_parent)
             old_parent.remove('mouse_clicked', self.on_mouse_clicked_in_parent)
+            old_parent.remove('start_mouse_dragging', self.on_start_mouse_dragging_in_parent)
+            old_parent.remove('stop_mouse_dragging', self.on_stop_mouse_dragging_in_parent)
             old_parent.remove('added_to_stage', self.on_added_to_stage)
             old_parent.remove('removed_from_stage', self.on_removed_from_stage)
             old_parent.remove('visible', self.on_parent_visible)
@@ -223,6 +233,8 @@ class ElementView(PubSub, ParentChild):
             parent.on('moved', self.on_parent_moved)
             parent.on('mouse_motion', self.on_mouse_moved_in_parent)
             parent.on('mouse_clicked', self.on_mouse_clicked_in_parent)
+            parent.on('start_mouse_dragging', self.on_start_mouse_dragging_in_parent)
+            parent.on('stop_mouse_dragging', self.on_stop_mouse_dragging_in_parent)
             parent.on('added_to_stage', self.on_added_to_stage)
             parent.on('removed_from_stage', self.on_removed_from_stage)
             parent.on('visible', self.on_parent_visible)
@@ -263,6 +275,21 @@ class ElementView(PubSub, ParentChild):
             parent = parent.parent
             
         return gx, gy
+    
+    def on_start_mouse_dragging_in_parent(self, event, **kwargs):
+        if self.draggable:
+            x, y = kwargs['position']
+        
+            _x, _y = self.to_local_position(kwargs['position'])
+            
+            if self.is_point_inside(_x, _y):
+                self.dragging = True
+                self.emit('started_mouse_dragging')
+            
+    def on_stop_mouse_dragging_in_parent(self, event, **kwargs):
+        if self.draggable:
+            self.dragging = False
+            self.emit('stopped_mouse_dragging')
             
     def on_mouse_moved_in_parent(self, event, **kwargs):
         if not self.visible:
@@ -279,11 +306,19 @@ class ElementView(PubSub, ParentChild):
                 self.mouse_over = True
                 self.emit('mouse_entered')
                 self.on_mouse_entered(event, **kwargs)
+            if self.dragging:
+                dx, dy = kwargs['delta']
+                self.x += dx
+                self.y += dy
+                self.emit('mouse_dragging')
         else:
             if self.mouse_over:
                 self.mouse_over = False
                 self.emit("mouse_exited")
                 self.on_mouse_exited(event, **kwargs)
+            if self.dragging:
+                self.emit('stopped_mouse_dragging')
+                self.dragging = False
         self._last_known_mouse = (x, y)
             
     def on_mouse_entered(self, event, **kwargs):
@@ -313,6 +348,7 @@ class ElementView(PubSub, ParentChild):
         
         if not self.visible:
             return
+        
         
         self.pre_render(surface)
         if self._surface is not None:
@@ -365,4 +401,16 @@ class ElementView(PubSub, ParentChild):
                 self.emit('hidden')
             self._visible = value
     visible = property(_get_visible, _set_visible)
+    
+    def _get_model(self):
+        return self._model
+    def _set_model(self, model):
+        self._model = model
+        self.make_dirty()
+    model = property(_get_model, _set_model)
+    
+    def _get_id(self):
+        return self._id
+    id = property(_get_id)
+ElementView.next_id = 0
     

@@ -10,6 +10,10 @@ class Engine(PubSub):
 
         self.width = width
         self.height = height
+        
+        self._first_mouse_event = True
+        self._last_mouse_x = 0
+        self._last_mouse_y = 0
 
     def init(self):
         if not hasattr(self, 'initialized'):
@@ -125,7 +129,19 @@ class Engine(PubSub):
                 self.emit(''.join([name, '_up']))
             elif event.type == pygame.MOUSEMOTION:
                 any_input = True
-                self.emit('mouse_motion', position=event.pos, relative=event.rel, button_states=event.buttons)
+                
+                delta = [0, 0]
+                if self._first_mouse_event:
+                    self._last_mouse_x = event.pos[0]
+                    self._last_mouse_y = event.pos[1]
+                    self._first_mouse_event = False
+                else:
+                    delta[0] = event.pos[0] - self._last_mouse_x
+                    delta[1] = event.pos[1] - self._last_mouse_y
+                    self._last_mouse_x = event.pos[0]
+                    self._last_mouse_y = event.pos[1]
+                    
+                self.emit('mouse_motion', position=event.pos, relative=event.rel, button_states=event.buttons, delta = delta)
             elif event.type == pygame.MOUSEBUTTONUP:
                 any_input = True
                 self.emit('mouse_up', position=event.pos, button=event.button)

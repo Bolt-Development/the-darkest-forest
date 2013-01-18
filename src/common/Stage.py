@@ -11,6 +11,7 @@ class Stage(Engine, ParentChild):
         
         self._do_once = True
         self.last_mouse_down_target = None
+        self.dragging = False
         self.on_stage = True    # views climbing up their ancestors need this
         
     def start(self, scene, start_paused = False):
@@ -41,13 +42,30 @@ class Stage(Engine, ParentChild):
         
         if message_type == 'mouse_down':
             self.last_mouse_down_target = kwargs['position']
+            self.last_mouse_down_time = pygame.time.get_ticks()
         elif message_type == 'mouse_up':
-            self.emit('mouse_clicked', down_target=self.last_mouse_down_target, up_target=kwargs['position'])
+            if not self.dragging:
+                self.emit('mouse_clicked', down_target=self.last_mouse_down_target, up_target=kwargs['position'])
+            else:
+                self.dragging = False
+                self.emit('stop_mouse_dragging', **kwargs)
+                
             self.last_mouse_down_target = None
             return
         elif message_type == 'mouse_motion':
-            # TODO :: mouse dragging
-            pass 
+            if self.dragging: 
+                self.emit('mouse_dragged')
+            elif not self.dragging:
+                if self.last_mouse_down_target is not None:
+                    now = pygame.time.get_ticks()
+                    position = kwargs['position']
+                    delta = kwargs['delta']
+                    
+                    same_place = [position[x] - delta[x] == self.last_mouse_down_target[x] for x in xrange(len(position))]
+                    
+                    if now - self.last_mouse_down_time > 25 and all(same_place):
+                        self.dragging = True
+                        self.emit('start_mouse_dragging', **kwargs)
         elif message_type == 'render' or message_type == 'tick':
             Engine.emit(self, message_type, **kwargs)
             return

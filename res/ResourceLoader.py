@@ -47,7 +47,7 @@ class ResourceLoader(object):
         return [res for res in self.cache if res.type == type]
        
     def load_resource_by_name_and_type(self, name, type):
-        return [res for res in self.cache if name == name and res.type == type][0]
+        return [res for res in self.cache if name == res.name and res.type == type][0]
     
 class Resource(object):
     def __init__(self, path):
@@ -69,6 +69,11 @@ class Resource(object):
                 size = kwargs['size']
             except:
                 pass
-            return pygame.font.Font(self.path, size)
+
+            try:
+                return pygame.font.Font(self.path, size)
+            except:
+                pygame.font.init()
+                return pygame.font.Font(self.path, size)
         else:
             return self.path
