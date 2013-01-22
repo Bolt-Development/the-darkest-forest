@@ -103,7 +103,7 @@ class Toggle(Button):
             else:
                 self.text = self.default_text + ' Off'
                 
-        print self.children
+        self.emit('toggled', state = self.active)
             
     def _get_active(self):
         return self._active
