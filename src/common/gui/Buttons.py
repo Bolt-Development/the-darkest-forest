@@ -80,6 +80,9 @@ class Toggle(Button):
         self.on_mouse_clicked(None)
         
     def on_mouse_clicked(self, event, **kwargs):
+        self.toggle()
+        
+    def toggle(self):
         self.active = not self._active
         
         if self.active:

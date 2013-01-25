@@ -58,6 +58,9 @@ class ElementView(PubSub, ParentChild):
         
         self.draggable = False
         self.dragging = False
+        self.drag_x = True
+        self.drag_y = True
+        self.drag_outside_parent = True
         
         
     def is_point_inside(self, x, y):
@@ -218,7 +221,7 @@ class ElementView(PubSub, ParentChild):
             old_parent.remove('mouse_motion', self.on_mouse_moved_in_parent)
             old_parent.remove('mouse_clicked', self.on_mouse_clicked_in_parent)
             old_parent.remove('start_mouse_dragging', self.on_start_mouse_dragging_in_parent)
-            old_parent.remove('stop_mouse_dragging', self.on_stop_mouse_dragging_in_parent)
+            old_parent.remove('stopped_mouse_dragging', self.on_stop_mouse_dragging_in_parent)
             old_parent.remove('added_to_stage', self.on_added_to_stage)
             old_parent.remove('removed_from_stage', self.on_removed_from_stage)
             old_parent.remove('visible', self.on_parent_visible)
@@ -234,7 +237,7 @@ class ElementView(PubSub, ParentChild):
             parent.on('mouse_motion', self.on_mouse_moved_in_parent)
             parent.on('mouse_clicked', self.on_mouse_clicked_in_parent)
             parent.on('start_mouse_dragging', self.on_start_mouse_dragging_in_parent)
-            parent.on('stop_mouse_dragging', self.on_stop_mouse_dragging_in_parent)
+            parent.on('stopped_mouse_dragging', self.on_stop_mouse_dragging_in_parent)
             parent.on('added_to_stage', self.on_added_to_stage)
             parent.on('removed_from_stage', self.on_removed_from_stage)
             parent.on('visible', self.on_parent_visible)
@@ -277,23 +280,47 @@ class ElementView(PubSub, ParentChild):
         return gx, gy
     
     def on_start_mouse_dragging_in_parent(self, event, **kwargs):
-        if self.draggable:
-            x, y = kwargs['position']
-        
-            _x, _y = self.to_local_position(kwargs['position'])
-            
-            if self.is_point_inside(_x, _y):
+        _x, _y = self.to_local_position(kwargs['position'])
+         
+        if self.is_point_inside(_x, _y):
+            if any(self.map(lambda x: x.on_start_mouse_dragging_in_parent(event, **kwargs), False)):
+                self.dragging = False
+            elif self.draggable:
                 self.dragging = True
                 self.emit('started_mouse_dragging')
+        return self.dragging
             
     def on_stop_mouse_dragging_in_parent(self, event, **kwargs):
         if self.draggable:
             self.dragging = False
-            self.emit('stopped_mouse_dragging')
+        self.emit('stopped_mouse_dragging')
             
     def on_mouse_moved_in_parent(self, event, **kwargs):
         if not self.visible:
             return
+        
+        if self.dragging:
+            dx, dy = kwargs['delta']
+            nx, ny = self.x, self.y
+            if self.drag_x:
+                nx += dx
+            if self.drag_y:
+                ny += dy
+                
+                
+            if not self.drag_outside_parent and self.parent is not None:
+                if nx < 0:
+                    nx = 0
+                if ny < 0:
+                    ny = 0
+                if nx + self.width > self.parent.width:
+                    nx = self.parent.width - self.width
+                if ny + self.height > self.parent.height:
+                    ny = self.parent.height - self.height
+                        
+            self.x = nx
+            self.y = ny
+            self.emit('mouse_dragging')
         
         x, y = kwargs['position']
         
@@ -306,19 +333,11 @@ class ElementView(PubSub, ParentChild):
                 self.mouse_over = True
                 self.emit('mouse_entered')
                 self.on_mouse_entered(event, **kwargs)
-            if self.dragging:
-                dx, dy = kwargs['delta']
-                self.x += dx
-                self.y += dy
-                self.emit('mouse_dragging')
         else:
             if self.mouse_over:
                 self.mouse_over = False
                 self.emit("mouse_exited")
                 self.on_mouse_exited(event, **kwargs)
-            if self.dragging:
-                self.emit('stopped_mouse_dragging')
-                self.dragging = False
         self._last_known_mouse = (x, y)
             
     def on_mouse_entered(self, event, **kwargs):

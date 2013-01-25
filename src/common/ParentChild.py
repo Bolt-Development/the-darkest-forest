@@ -54,6 +54,17 @@ class ParentChild(object):
     def on_parent_changed(self, parent, old_parent):
         pass
     
+    def map(self, fun, append_self = True):
+        result = []
+        
+        for child in self.children:
+            result += child.map(fun)
+            
+        if append_self:
+            result.append(fun(self))
+        return result
+        
+        
 if __name__ == '__main__':
     node = ParentChild()
     node2 = ParentChild()

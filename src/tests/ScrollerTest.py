@@ -9,10 +9,13 @@ if __name__ == '__main__':
     from common.Transitions import *
 
     
+    from common.gui.Layouts import *
     from common.gui.Buttons import *
+    from common.gui.Sliders import *
     from models.ImageModels import *
     from models.TextModels import *
     from views.ImageView import *
+    from views.TextViews import *
     from ResourceLoader import *
 
     loader = ResourceLoader()
@@ -28,6 +31,8 @@ if __name__ == '__main__':
     stage = Stage()
 
     scene = Scene('Toggle and Slider Test')
+    scene.width = stage.width
+    scene.height = stage.height
 
     container = Scene('Options Container')
     container.draggable = True
@@ -41,6 +46,21 @@ if __name__ == '__main__':
     toggle.x = 30
     toggle.y = 12
     container.add_child(toggle)
+
+    hbox = HBox()
+    slider = HSlider(toggle.width)
+
+    sound_level_label = TextView(TextModel(font, 'Sound Level', 14))
+
+    hbox.add_child(sound_level_label)
+    hbox.add_child(slider)
+
+    hbox.x = 38
+    hbox.y = toggle.y + toggle.height + 15
+
+    slider.y = hbox.height * 0.5 - slider.height * 0.5
+    
+    container.add_child(hbox)
 
     scene.add_child(container)
 

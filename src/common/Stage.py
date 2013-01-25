@@ -48,7 +48,7 @@ class Stage(Engine, ParentChild):
                 self.emit('mouse_clicked', down_target=self.last_mouse_down_target, up_target=kwargs['position'])
             else:
                 self.dragging = False
-                self.emit('stop_mouse_dragging', **kwargs)
+                self.emit('stopped_mouse_dragging', **kwargs)
                 
             self.last_mouse_down_target = None
             return
