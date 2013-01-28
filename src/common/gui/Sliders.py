@@ -31,11 +31,22 @@ class HSlider(ElementView):
         self._current = 0
         self.current = current
         
+    def on_mouse_clicked(self, event, **kwargs):
+        position = self.to_local_position(kwargs['up_target'])
+        print position[0]
+        print position[0] / self.width
+        
     def init_bullet(self):
         self.bullet = SliderBullet(self)
         self.drag_y = False
         self.bullet.height = self.height
         self.bullet.width = self.width * 0.15
+        
+        self.bullet.on('moved', self.on_bullet_moved)
+        
+    def on_bullet_moved(self, event, **kwargs):
+        self._current = self.bullet.x / (self.width - self.bullet.width)
+        self.emit('changed')
         
     def _get_current(self):
         return self._current

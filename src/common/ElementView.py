@@ -277,12 +277,15 @@ class ElementView(PubSub, ParentChild):
             
             parent = parent.parent
             
+        gx -= self.x
+        gy -= self.y
+            
         return gx, gy
     
     def on_start_mouse_dragging_in_parent(self, event, **kwargs):
         _x, _y = self.to_local_position(kwargs['position'])
          
-        if self.is_point_inside(_x, _y):
+        if _x >= 0 and _x <= self.width and _y >= 0 and _y <= self.height:
             if any(self.map(lambda x: x.on_start_mouse_dragging_in_parent(event, **kwargs), False)):
                 self.dragging = False
             elif self.draggable:
@@ -326,7 +329,7 @@ class ElementView(PubSub, ParentChild):
         
         _x, _y = self.to_local_position(kwargs['position'])
             
-        if self.is_point_inside(_x, _y):
+        if _x >= 0 and _x <= self.width and _y >= 0 and _y <= self.height:
             if self.mouse_over:
                 self.emit('mouse_motion', **kwargs)
             else:
@@ -353,7 +356,10 @@ class ElementView(PubSub, ParentChild):
         down_x, down_y = self.to_local_position(kwargs['down_target'])
         up_x, up_y = self.to_local_position(kwargs['up_target'])
         
-        if self.is_point_inside(down_x, down_y) and self.is_point_inside(up_x, up_y):
+        down_in = down_x >= 0 and down_x <= self.width and down_y >= 0 and down_y <= self.height
+        up_in = up_x >= 0 and up_x <= self.width and up_y >= 0 and up_y <= self.height
+        
+        if down_in and up_in:
             kwargs['target'] = self
             self.propagate(event, **kwargs)
             
